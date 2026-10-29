@@ -1356,6 +1356,30 @@
     <rdfs:label>can assume role</rdfs:label>
     <rdfs:range rdf:resource="https://w3id.org/arango-solutions/aws-ontology#IAMRole"/>
   </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#canManagePermissions">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:comment>Derived: the identity is effectively allowed at least one Permissions management access-level action on the resource (e.g. s3:PutBucketPolicy, iam:AttachRolePolicy), so it can change who else has access</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/arango-solutions/aws-ontology#IAMIdentity"/>
+    <rdfs:label>can manage permissions</rdfs:label>
+    <rdfs:range rdf:resource="https://w3id.org/arango-solutions/aws-ontology#AWSResource"/>
+    <rdfs:subPropertyOf rdf:resource="https://w3id.org/arango-solutions/aws-ontology#hasEffectiveAccess"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#canRead">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:comment>Derived: the identity is effectively allowed at least one Read access-level action on the resource (e.g. s3:GetObject)</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/arango-solutions/aws-ontology#IAMIdentity"/>
+    <rdfs:label>can read</rdfs:label>
+    <rdfs:range rdf:resource="https://w3id.org/arango-solutions/aws-ontology#AWSResource"/>
+    <rdfs:subPropertyOf rdf:resource="https://w3id.org/arango-solutions/aws-ontology#hasEffectiveAccess"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#canWrite">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:comment>Derived: the identity is effectively allowed at least one Write access-level action on the resource (e.g. s3:PutObject, s3:DeleteObject)</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/arango-solutions/aws-ontology#IAMIdentity"/>
+    <rdfs:label>can write</rdfs:label>
+    <rdfs:range rdf:resource="https://w3id.org/arango-solutions/aws-ontology#AWSResource"/>
+    <rdfs:subPropertyOf rdf:resource="https://w3id.org/arango-solutions/aws-ontology#hasEffectiveAccess"/>
+  </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#chargedBy">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
     <rdfs:comment>Inverse of incurs charge for</rdfs:comment>
@@ -1847,6 +1871,13 @@
     <rdfs:label>has effect</rdfs:label>
     <rdfs:range rdf:resource="https://w3id.org/arango-solutions/aws-ontology#Effect"/>
   </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#hasEffectiveAccess">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:comment>Derived: after policy evaluation, the identity is allowed at least one action on the resource. For a group, this is the access its members inherit through it. Not an AWS attribute; computed from policies, boundaries, SCPs and role assumption.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/arango-solutions/aws-ontology#IAMIdentity"/>
+    <rdfs:label>has effective access</rdfs:label>
+    <rdfs:range rdf:resource="https://w3id.org/arango-solutions/aws-ontology#AWSResource"/>
+  </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#hasExecutionRole">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
     <rdfs:comment>The IAM role a resource runs as, granting it permissions to call AWS services (e.g. a Lambda function's execution role, which Lambda assumes when the function is invoked). See https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html</rdfs:comment>
@@ -2242,6 +2273,13 @@
     <rdfs:label>invokes model</rdfs:label>
     <rdfs:range rdf:resource="https://w3id.org/arango-solutions/aws-ontology#FoundationModel"/>
     <rdfs:subPropertyOf rdf:resource="https://w3id.org/arango-solutions/aws-ontology#uses"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#isAdministrator">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:comment>Derived: whether the user's or role's effective permissions amount to full administrative access (e.g. Allow * on *, as granted by the AWS managed policy AdministratorAccess)</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/arango-solutions/aws-ontology#IAMEntity"/>
+    <rdfs:label>is administrator</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#isDefault">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>

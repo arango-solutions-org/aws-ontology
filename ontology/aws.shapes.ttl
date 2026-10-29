@@ -214,3 +214,13 @@
         sh:severity sh:Violation ;
         sh:message "If present, a resource's publicly-accessible flag must be a single boolean." ;
     ] .
+
+:AdministratorFlagShape a sh:NodeShape ;
+    sh:targetSubjectsOf :isAdministrator ;
+    sh:property [
+        sh:path :isAdministrator ;
+        sh:datatype xsd:boolean ;
+        sh:maxCount 1 ;
+        sh:severity sh:Violation ;
+        sh:message "If present, an identity's administrator flag must be a single boolean." ;
+    ] .
