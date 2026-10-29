@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Derived access relationships** for recording the result of IAM
+  [policy evaluation](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html).
+  These are computed, not stored by AWS:
+  - `hasEffectiveAccess` (`IAMIdentity` → `AWSResource`) with sub-properties `canRead`,
+    `canWrite` and `canManagePermissions`, matching AWS's Read, Write and Permissions management
+    access levels.
+  - `isAdministrator` (`IAMEntity` → `xsd:boolean`), checked by `AdministratorFlagShape`.
+  - Examples: the Lambda execution role can read the artifacts bucket, the EC2 service role has
+    (List-level) access to the web server, and a new break-glass role with `AdministratorAccess`
+    can read, write and manage permissions on the bucket.
+
 ## [0.6.0] - 2026-10-26
 
 First release under the [Arango Solutions](https://github.com/arango-solutions-org) GitHub

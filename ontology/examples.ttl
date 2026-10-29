@@ -62,13 +62,17 @@
     :arn "arn:aws:iam::123456789012:role/EC2ServiceRole" ;
     :hasPolicyAttachment :EC2BasicAccessPolicy ;
     :hasTrustRelationship :EC2TrustPolicy ;
-    :maxSessionDuration "3600"^^xsd:integer .
+    :maxSessionDuration "3600"^^xsd:integer ;
+    :hasEffectiveAccess :WebServerInstance ;
+    :isAdministrator "false"^^xsd:boolean .
 
 :LambdaExecutionRole rdf:type :IAMRole ;
     rdfs:label "Lambda Execution Role" ;
     :arn "arn:aws:iam::123456789012:role/LambdaExecutionRole" ;
     :hasPolicyAttachment :LambdaBasicExecution, :S3ReadOnlyAccess ;
-    :hasTrustRelationship :LambdaTrustPolicy .
+    :hasTrustRelationship :LambdaTrustPolicy ;
+    :canRead :CompanyArtifacts ;
+    :isAdministrator "false"^^xsd:boolean .
 
 # Example Managed Policies
 :AWSSecurityAuditPolicy rdf:type :AWSManagedPolicy ;
@@ -1381,3 +1385,17 @@
     :arn "arn:aws:ec2:us-east-1:123456789012:transit-gateway-attachment/tgw-attach-0abcdef1234567890" ;
     :attachesDirectConnectGateway :CorpDXGateway ;
     :environment "production" .
+
+# Derived access (results of policy evaluation, not AWS attributes)
+:AdministratorAccessPolicy rdf:type :AWSManagedPolicy ;
+    rdfs:label "AdministratorAccess" ;
+    :arn "arn:aws:iam::aws:policy/AdministratorAccess" .
+
+:BreakGlassAdminRole rdf:type :IAMRole ;
+    rdfs:label "Break-glass Admin Role" ;
+    :arn "arn:aws:iam::123456789012:role/BreakGlassAdminRole" ;
+    :hasPolicyAttachment :AdministratorAccessPolicy ;
+    :isAdministrator "true"^^xsd:boolean ;
+    :canRead :CompanyArtifacts ;
+    :canWrite :CompanyArtifacts ;
+    :canManagePermissions :CompanyArtifacts .
