@@ -124,3 +124,13 @@
         sh:severity sh:Warning ;
         sh:message "An IAM policy should have at least one structured statement (many example policies currently only carry :policyDocument text — see drift alert aws-ontology_REQ-018-policy-statement-coverage)." ;
     ] .
+
+:AdministratorFlagShape a sh:NodeShape ;
+    sh:targetSubjectsOf :isAdministrator ;
+    sh:property [
+        sh:path :isAdministrator ;
+        sh:datatype xsd:boolean ;
+        sh:maxCount 1 ;
+        sh:severity sh:Violation ;
+        sh:message "If present, an identity's administrator flag must be a single boolean." ;
+    ] .

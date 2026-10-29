@@ -2746,3 +2746,42 @@
     rdfs:comment "The sequential position of a stage within its pipeline" ;
     rdfs:domain :CodePipelineStage ;
     rdfs:range xsd:integer .
+
+# Derived (computed) access relationships
+# These are not attributes AWS stores. They are the result of evaluating identity policies,
+# resource policies, permission boundaries, SCPs and role assumption, as described in
+# https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html
+# Tools that do that evaluation (e.g. IAM Access Analyzer, a policy simulator, or a graph
+# traversal) can record their result with these terms.
+:hasEffectiveAccess a owl:ObjectProperty ;
+    rdfs:label "has effective access" ;
+    rdfs:comment "Derived: after policy evaluation, the identity is allowed at least one action on the resource. For a group, this is the access its members inherit through it. Not an AWS attribute; computed from policies, boundaries, SCPs and role assumption." ;
+    rdfs:domain :IAMIdentity ;
+    rdfs:range :AWSResource .
+
+:canRead a owl:ObjectProperty ;
+    rdfs:label "can read" ;
+    rdfs:comment "Derived: the identity is effectively allowed at least one Read access-level action on the resource (e.g. s3:GetObject)" ;
+    rdfs:subPropertyOf :hasEffectiveAccess ;
+    rdfs:domain :IAMIdentity ;
+    rdfs:range :AWSResource .
+
+:canWrite a owl:ObjectProperty ;
+    rdfs:label "can write" ;
+    rdfs:comment "Derived: the identity is effectively allowed at least one Write access-level action on the resource (e.g. s3:PutObject, s3:DeleteObject)" ;
+    rdfs:subPropertyOf :hasEffectiveAccess ;
+    rdfs:domain :IAMIdentity ;
+    rdfs:range :AWSResource .
+
+:canManagePermissions a owl:ObjectProperty ;
+    rdfs:label "can manage permissions" ;
+    rdfs:comment "Derived: the identity is effectively allowed at least one Permissions management access-level action on the resource (e.g. s3:PutBucketPolicy, iam:AttachRolePolicy), so it can change who else has access" ;
+    rdfs:subPropertyOf :hasEffectiveAccess ;
+    rdfs:domain :IAMIdentity ;
+    rdfs:range :AWSResource .
+
+:isAdministrator a owl:DatatypeProperty ;
+    rdfs:label "is administrator" ;
+    rdfs:comment "Derived: whether the user's or role's effective permissions amount to full administrative access (e.g. Allow * on *, as granted by the AWS managed policy AdministratorAccess)" ;
+    rdfs:domain :IAMEntity ;
+    rdfs:range xsd:boolean .
