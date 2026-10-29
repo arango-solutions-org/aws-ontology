@@ -9,8 +9,8 @@ A comprehensive semantic ontology for Amazon Web Services (AWS) resources and th
 
 The AWS Ontology is a semantic web resource that:
 
-- **Models 162 AWS resource classes** across compute, storage, networking, containers, API services, generative AI, workforce and consumer identity, governance, detective security, DNS, caching, analytics, and deployment
-- **Defines 156 object properties and 119 datatype properties**, including temporal, cost, and compliance relationships
+- **Models 163 AWS resource classes** across compute, storage, networking, containers, API services, generative AI, workforce and consumer identity, governance, detective security, DNS, caching, analytics, and deployment
+- **Defines 159 object properties and 123 datatype properties**, including temporal, cost, and compliance relationships
 - **Ships 207 example instances** with sanitized, realistic AWS configurations
 - **Is published in two synchronized serializations** (Turtle and RDF/XML), verified triple-for-triple identical
 - **Includes semantic constraints** (cardinality restrictions, disjoint categories, inverse and sub-properties) and SHACL shapes for closed-world validation of instance data
@@ -21,9 +21,9 @@ The AWS Ontology is a semantic web resource that:
 | Metric | Count |
 |--------|-------|
 | **Total Triples** | 2,220 |
-| **Classes** | 162 |
-| **Object Properties** | 156 |
-| **Datatype Properties** | 119 |
+| **Classes** | 163 |
+| **Object Properties** | 159 |
+| **Datatype Properties** | 123 |
 | **Example Instances** | 207 |
 
 ## Namespace and Versioning
@@ -265,8 +265,8 @@ open ontology/aws.owl
 ```
 
 **Key Protégé Features:**
-- **Class Hierarchy**: Browse 162 AWS resource classes
-- **Object Properties**: Explore 156 relationship types
+- **Class Hierarchy**: Browse 163 AWS resource classes
+- **Object Properties**: Explore 159 relationship types
 - **Reasoning**: Validate with HermiT reasoner
 - **OntoGraf**: Visualize relationships graphically
 - **SPARQL**: Test queries from our examples

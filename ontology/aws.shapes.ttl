@@ -124,3 +124,65 @@
         sh:severity sh:Warning ;
         sh:message "An IAM policy should have at least one structured statement (many example policies currently only carry :policyDocument text — see drift alert aws-ontology_REQ-018-policy-statement-coverage)." ;
     ] .
+
+:LambdaFunctionShape a sh:NodeShape ;
+    sh:targetClass :LambdaFunction ;
+    sh:property [
+        sh:path :hasExecutionRole ;
+        sh:class :IAMRole ;
+        sh:maxCount 1 ;
+        sh:severity sh:Violation ;
+        sh:message "A Lambda function has at most one execution role." ;
+    ] .
+
+:EC2InstanceShape a sh:NodeShape ;
+    sh:targetClass :EC2Instance ;
+    sh:property [
+        sh:path :hasInstanceProfile ;
+        sh:class :IAMInstanceProfile ;
+        sh:maxCount 1 ;
+        sh:severity sh:Violation ;
+        sh:message "An EC2 instance can have at most one instance profile (one IAM role) attached." ;
+    ] .
+
+:TagShape a sh:NodeShape ;
+    sh:targetClass :Tag ;
+    sh:property [
+        sh:path :tagKey ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:minLength 1 ;
+        sh:maxLength 128 ;
+        sh:severity sh:Violation ;
+        sh:message "A tag must have exactly one key of 1-128 characters." ;
+    ] ;
+    sh:property [
+        sh:path :tagValue ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        sh:maxLength 256 ;
+        sh:severity sh:Violation ;
+        sh:message "A tag has at most one value of up to 256 characters." ;
+    ] .
+
+:ActionShape a sh:NodeShape ;
+    sh:targetClass :Action ;
+    sh:property [
+        sh:path :accessLevel ;
+        sh:datatype xsd:string ;
+        sh:maxCount 1 ;
+        sh:pattern "^(List|Read|Write|Permissions management|Tagging)$" ;
+        sh:severity sh:Violation ;
+        sh:message "An action's access level must be one of AWS's five levels: List, Read, Write, Permissions management, Tagging." ;
+    ] .
+
+:PubliclyAccessibleShape a sh:NodeShape ;
+    sh:targetSubjectsOf :isPubliclyAccessible ;
+    sh:property [
+        sh:path :isPubliclyAccessible ;
+        sh:datatype xsd:boolean ;
+        sh:maxCount 1 ;
+        sh:severity sh:Violation ;
+        sh:message "If present, a resource's publicly-accessible flag must be a single boolean." ;
+    ] .

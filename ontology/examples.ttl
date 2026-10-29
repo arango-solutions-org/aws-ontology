@@ -215,7 +215,10 @@
     rdfs:label "Web Server" ;
     :arn "arn:aws:ec2:us-east-1:123456789012:instance/i-0webserver1234567" ;
     :belongsToVPC :ProductionVPC ;
-    :attachedTo :WebServerVolume .
+    :attachedTo :WebServerVolume ;
+    :hasInstanceProfile :EC2InstanceProfile ;
+    :isPubliclyAccessible "true"^^xsd:boolean ;
+    :hasTag :WebTeamOwnerTag, :WebCostCenterTag .
 
 :WebServerVolume rdf:type :EBSVolume ;
     rdfs:label "Web Server Root Volume" ;
@@ -223,7 +226,9 @@
 
 :CompanyArtifacts rdf:type :S3Bucket ;
     rdfs:label "Company Artifacts Bucket" ;
-    :arn "arn:aws:s3:::company-artifacts-bucket" .
+    :arn "arn:aws:s3:::company-artifacts-bucket" ;
+    :isPubliclyAccessible "false"^^xsd:boolean ;
+    :hasTag :PlatformTeamOwnerTag .
 
 # Example Policy Statement Components
 :AllowEC2Describe rdf:type :PolicyStatement ;
@@ -631,7 +636,7 @@
 :UserLambdaFunction rdf:type :LambdaFunction ;
     rdfs:label "User Management Lambda" ;
     :arn "arn:aws:lambda:us-east-1:123456789012:function:UserManagementLambda" ;
-    :uses :UserLambdaExecutionRole .
+    :hasExecutionRole :UserLambdaExecutionRole .
 
 # IAM Roles for API & Integration Services
 :APIGatewayExecutionRole rdf:type :IAMRole ;
@@ -968,28 +973,36 @@
     rdfs:label "securityhub:List*" .
 
 :CloudTrailLookupEventsAction rdf:type :Action ;
-    rdfs:label "cloudtrail:LookupEvents" .
+    rdfs:label "cloudtrail:LookupEvents" ;
+    :accessLevel "Read"^^xsd:string .
 
 :ECRGetAuthorizationTokenAction rdf:type :Action ;
-    rdfs:label "ecr:GetAuthorizationToken" .
+    rdfs:label "ecr:GetAuthorizationToken" ;
+    :accessLevel "Read"^^xsd:string .
 
 :ECRBatchCheckLayerAvailabilityAction rdf:type :Action ;
-    rdfs:label "ecr:BatchCheckLayerAvailability" .
+    rdfs:label "ecr:BatchCheckLayerAvailability" ;
+    :accessLevel "Read"^^xsd:string .
 
 :ECRGetDownloadUrlForLayerAction rdf:type :Action ;
-    rdfs:label "ecr:GetDownloadUrlForLayer" .
+    rdfs:label "ecr:GetDownloadUrlForLayer" ;
+    :accessLevel "Read"^^xsd:string .
 
 :ECRBatchGetImageAction rdf:type :Action ;
-    rdfs:label "ecr:BatchGetImage" .
+    rdfs:label "ecr:BatchGetImage" ;
+    :accessLevel "Read"^^xsd:string .
 
 :EC2DescribeInstancesAction rdf:type :Action ;
-    rdfs:label "ec2:DescribeInstances" .
+    rdfs:label "ec2:DescribeInstances" ;
+    :accessLevel "List"^^xsd:string .
 
 :EC2DescribeImagesAction rdf:type :Action ;
-    rdfs:label "ec2:DescribeImages" .
+    rdfs:label "ec2:DescribeImages" ;
+    :accessLevel "List"^^xsd:string .
 
 :EC2DescribeKeyPairsAction rdf:type :Action ;
-    rdfs:label "ec2:DescribeKeyPairs" .
+    rdfs:label "ec2:DescribeKeyPairs" ;
+    :accessLevel "List"^^xsd:string .
 
 :IAMListAction rdf:type :Action ;
     rdfs:label "iam:List*" .
@@ -1001,16 +1014,20 @@
     rdfs:label "iam:Generate*" .
 
 :LambdaInvokeFunctionAction rdf:type :Action ;
-    rdfs:label "lambda:InvokeFunction" .
+    rdfs:label "lambda:InvokeFunction" ;
+    :accessLevel "Write"^^xsd:string .
 
 :StatesStartExecutionAction rdf:type :Action ;
-    rdfs:label "states:StartExecution" .
+    rdfs:label "states:StartExecution" ;
+    :accessLevel "Write"^^xsd:string .
 
 :SNSPublishAction rdf:type :Action ;
-    rdfs:label "sns:Publish" .
+    rdfs:label "sns:Publish" ;
+    :accessLevel "Write"^^xsd:string .
 
 :SQSSendMessageAction rdf:type :Action ;
-    rdfs:label "sqs:SendMessage" .
+    rdfs:label "sqs:SendMessage" ;
+    :accessLevel "Write"^^xsd:string .
 
 # Examples for AWS Organizations and Control Tower
 :MainOrganization rdf:type :Organization ;
@@ -1381,3 +1398,19 @@
     :arn "arn:aws:ec2:us-east-1:123456789012:transit-gateway-attachment/tgw-attach-0abcdef1234567890" ;
     :attachesDirectConnectGateway :CorpDXGateway ;
     :environment "production" .
+
+# Resource tags (key-value metadata; tags have no ARN)
+:WebTeamOwnerTag rdf:type :Tag ;
+    rdfs:label "owner=web-team" ;
+    :tagKey "owner"^^xsd:string ;
+    :tagValue "web-team"^^xsd:string .
+
+:WebCostCenterTag rdf:type :Tag ;
+    rdfs:label "cost-center=cc-1001" ;
+    :tagKey "cost-center"^^xsd:string ;
+    :tagValue "cc-1001"^^xsd:string .
+
+:PlatformTeamOwnerTag rdf:type :Tag ;
+    rdfs:label "owner=platform-team" ;
+    :tagKey "owner"^^xsd:string ;
+    :tagValue "platform-team"^^xsd:string .
