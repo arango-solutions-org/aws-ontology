@@ -2746,3 +2746,52 @@
     rdfs:comment "The sequential position of a stage within its pipeline" ;
     rdfs:domain :CodePipelineStage ;
     rdfs:range xsd:integer .
+
+# Identity attachments, resource tags and exposure (security analysis)
+:hasExecutionRole a owl:ObjectProperty ;
+    rdfs:label "has execution role" ;
+    rdfs:comment "The IAM role a compute resource runs as, granting it permissions to call AWS services (e.g. a Lambda function's execution role, which Lambda assumes when the function is invoked). See https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html" ;
+    rdfs:subPropertyOf :uses ;
+    rdfs:domain :ComputeResource ;
+    rdfs:range :IAMRole .
+
+:hasInstanceProfile a owl:ObjectProperty ;
+    rdfs:label "has instance profile" ;
+    rdfs:comment "The IAM instance profile attached to an EC2 instance; applications on the instance receive temporary credentials for the profile's role. An instance can have only one IAM role attached, through one instance profile. See https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html" ;
+    rdfs:subPropertyOf :attachedTo ;
+    rdfs:domain :EC2Instance ;
+    rdfs:range :IAMInstanceProfile .
+
+:Tag a owl:Class ;
+    rdfs:label "Tag" ;
+    rdfs:comment "A key-value label assigned to an AWS resource, commonly used for ownership, cost allocation and attribute-based access control. Tags are metadata on a resource and have no ARN of their own. See https://docs.aws.amazon.com/tag-editor/latest/userguide/tagging.html" .
+
+:hasTag a owl:ObjectProperty ;
+    rdfs:label "has tag" ;
+    rdfs:comment "Relates an AWS resource to a tag assigned to it" ;
+    rdfs:domain :AWSResource ;
+    rdfs:range :Tag .
+
+:tagKey a owl:DatatypeProperty ;
+    rdfs:label "tag key" ;
+    rdfs:comment "The key of a tag (case-sensitive, up to 128 Unicode characters, e.g. owner, cost-center)" ;
+    rdfs:domain :Tag ;
+    rdfs:range xsd:string .
+
+:tagValue a owl:DatatypeProperty ;
+    rdfs:label "tag value" ;
+    rdfs:comment "The value of a tag (case-sensitive, up to 256 Unicode characters; may be empty)" ;
+    rdfs:domain :Tag ;
+    rdfs:range xsd:string .
+
+:accessLevel a owl:DatatypeProperty ;
+    rdfs:label "access level" ;
+    rdfs:comment "The access level AWS assigns to an API action: List, Read, Write, Permissions management, or Tagging (as listed per action in the Service Authorization Reference). See https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_understand-policy-summary-access-level-summaries.html" ;
+    rdfs:domain :Action ;
+    rdfs:range xsd:string .
+
+:isPubliclyAccessible a owl:DatatypeProperty ;
+    rdfs:label "is publicly accessible" ;
+    rdfs:comment "Whether the resource can be reached from the internet or by principals outside the account, e.g. an RDS instance with PubliclyAccessible set, an EC2 instance with a public IP in a public subnet, or an S3 bucket shared publicly (as reported by IAM Access Analyzer). See https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-concepts.html" ;
+    rdfs:domain :AWSResource ;
+    rdfs:range xsd:boolean .

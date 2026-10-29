@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Identity attachments, tags and exposure** for security and access analysis:
+  - `hasExecutionRole` (`ComputeResource` → `IAMRole`, sub-property of `uses`): the role a
+    compute resource runs as, e.g. a Lambda function's
+    [execution role](https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html).
+  - `hasInstanceProfile` (`EC2Instance` → `IAMInstanceProfile`, sub-property of `attachedTo`).
+    AWS allows [one role per instance](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html),
+    checked by the new `EC2InstanceShape`.
+  - `Tag` class with `hasTag` (`AWSResource` → `Tag`), `tagKey` and `tagValue`. `Tag` is not an
+    `AWSResource` (tags have no ARN). `TagShape` checks AWS's 128/256-character key/value limits.
+  - `accessLevel` on `Action`: AWS's [access level](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_understand-policy-summary-access-level-summaries.html)
+    for an API action (List, Read, Write, Permissions management, Tagging), checked by `ActionShape`.
+  - `isPubliclyAccessible` (`AWSResource` → `xsd:boolean`).
+  - Examples: the user-management Lambda now uses `hasExecutionRole`; the web server has an
+    instance profile, tags and `isPubliclyAccessible true`; 12 example actions carry their
+    access level from the Service Authorization Reference.
+
 ## [0.6.0] - 2026-10-26
 
 First release under the [Arango Solutions](https://github.com/arango-solutions-org) GitHub
