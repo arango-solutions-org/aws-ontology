@@ -133,6 +133,12 @@
         sh:maxCount 1 ;
         sh:severity sh:Violation ;
         sh:message "A Lambda function has at most one execution role." ;
+    ] ;
+    sh:property [
+        sh:path :hasExecutionRole ;
+        sh:minCount 1 ;
+        sh:severity sh:Warning ;
+        sh:message "A Lambda function should have an execution role (AWS requires one)." ;
     ] .
 
 :EC2InstanceShape a sh:NodeShape ;
@@ -143,6 +149,26 @@
         sh:maxCount 1 ;
         sh:severity sh:Violation ;
         sh:message "An EC2 instance can have at most one instance profile (one IAM role) attached." ;
+    ] .
+
+:IAMInstanceProfileShape a sh:NodeShape ;
+    sh:targetClass :IAMInstanceProfile ;
+    sh:property [
+        sh:path :hasRole ;
+        sh:class :IAMRole ;
+        sh:maxCount 1 ;
+        sh:severity sh:Violation ;
+        sh:message "An instance profile can contain at most one IAM role." ;
+    ] .
+
+:TaggedResourceShape a sh:NodeShape ;
+    sh:targetSubjectsOf :hasTag ;
+    sh:property [
+        sh:path :hasTag ;
+        sh:class :Tag ;
+        sh:maxCount 50 ;
+        sh:severity sh:Violation ;
+        sh:message "A resource can have at most 50 user-applied tags." ;
     ] .
 
 :TagShape a sh:NodeShape ;
@@ -172,6 +198,8 @@
         sh:path :accessLevel ;
         sh:datatype xsd:string ;
         sh:maxCount 1 ;
+        # sh:pattern rather than sh:in: rdflib/pySHACL compare sh:in members as exact terms, so
+        # "Read" and "Read"^^xsd:string (the same RDF 1.1 literal) would not match each other.
         sh:pattern "^(List|Read|Write|Permissions management|Tagging)$" ;
         sh:severity sh:Violation ;
         sh:message "An action's access level must be one of AWS's five levels: List, Read, Write, Permissions management, Tagging." ;

@@ -11,7 +11,7 @@ The AWS Ontology is a semantic web resource that:
 
 - **Models 163 AWS resource classes** across compute, storage, networking, containers, API services, generative AI, workforce and consumer identity, governance, detective security, DNS, caching, analytics, and deployment
 - **Defines 159 object properties and 123 datatype properties**, including temporal, cost, and compliance relationships
-- **Ships 207 example instances** with sanitized, realistic AWS configurations
+- **Ships 210 example instances** with sanitized, realistic AWS configurations
 - **Is published in two synchronized serializations** (Turtle and RDF/XML), verified triple-for-triple identical
 - **Includes semantic constraints** (cardinality restrictions, disjoint categories, inverse and sub-properties) and SHACL shapes for closed-world validation of instance data
 - **Is verified in CI** by the HermiT OWL 2 DL reasoner (ontology + examples are consistent), SHACL validation, and a test suite
@@ -20,11 +20,11 @@ The AWS Ontology is a semantic web resource that:
 
 | Metric | Count |
 |--------|-------|
-| **Total Triples** | 2,220 |
+| **Total Triples** | 2,261 |
 | **Classes** | 163 |
 | **Object Properties** | 159 |
 | **Datatype Properties** | 123 |
-| **Example Instances** | 207 |
+| **Example Instances** | 210 |
 
 ## Namespace and Versioning
 

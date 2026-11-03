@@ -9,19 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Identity attachments, tags and exposure** for security and access analysis:
-  - `hasExecutionRole` (`ComputeResource` → `IAMRole`, sub-property of `uses`): the role a
-    compute resource runs as, e.g. a Lambda function's
+  - `hasExecutionRole` (`AWSResource` → `IAMRole`, sub-property of `uses`): the role a
+    resource runs as, e.g. a Lambda function's
     [execution role](https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html).
+    The domain is `AWSResource` rather than `ComputeResource` because resources in categories
+    disjoint with compute (SageMaker training jobs, Glue jobs, EventBridge rules, ...) also run as
+    roles. `LambdaFunctionShape` allows at most one execution role and warns when one is missing.
   - `hasInstanceProfile` (`EC2Instance` → `IAMInstanceProfile`, sub-property of `attachedTo`).
-    AWS allows [one role per instance](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html),
-    checked by the new `EC2InstanceShape`.
-  - `Tag` class with `hasTag` (`AWSResource` → `Tag`), `tagKey` and `tagValue`. `Tag` is not an
-    `AWSResource` (tags have no ARN). `TagShape` checks AWS's 128/256-character key/value limits.
+    AWS allows [one role per instance](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html):
+    `EC2InstanceShape` allows one instance profile per instance and `IAMInstanceProfileShape`
+    one role per instance profile.
+  - `Tag` class with `hasTag` (`AWSResource` → `Tag`), `tagKey` and `tagValue`. `Tag` is
+    disjoint with `AWSResource` (tags have no ARN). `TagShape` checks AWS's 128/256-character
+    key/value limits and `TaggedResourceShape` the 50-tags-per-resource limit.
   - `accessLevel` on `Action`: AWS's [access level](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_understand-policy-summary-access-level-summaries.html)
     for an API action (List, Read, Write, Permissions management, Tagging), checked by `ActionShape`.
   - `isPubliclyAccessible` (`AWSResource` → `xsd:boolean`).
-  - Examples: the user-management Lambda now uses `hasExecutionRole`; the web server has an
-    instance profile, tags and `isPubliclyAccessible true`; 12 example actions carry their
+  - Examples: the user-management Lambda, the ECS web application service, the EKS node group and
+    the order-processing Step Functions state machine now use `hasExecutionRole`; the web server
+    has an instance profile, tags and `isPubliclyAccessible true`; 12 example actions carry their
     access level from the Service Authorization Reference.
 
 ## [0.6.0] - 2026-10-26
