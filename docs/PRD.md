@@ -1,7 +1,7 @@
 # AWS Object and Relationship Ontology Development - Product Requirements Document
 
-**Document Version:** 2.1
-**Date:** October 2026
+**Document Version:** 2.2
+**Date:** November 2026
 
 > **Requirement identifiers.** Every testable requirement in this document carries a stable
 > `REQ-NNN` identifier, referenced from tests and changelog entries. IDs are never renumbered;
@@ -94,6 +94,7 @@ implemented ontology may exceed this list.
 | REQ-013 | Dependency properties MUST exist: `dependsOn` (general), `isSourceFor` (e.g., snapshot → volume) |
 | REQ-014 | Inverse properties MUST be defined where semantically meaningful |
 | REQ-024 | Specific relationships that are semantically special cases of a generic cross-cutting property (REQ-016's exemption list) MUST be declared `rdfs:subPropertyOf` that generic property, so transitive/general-purpose queries over the generic property also match the specific ones |
+| REQ-042 | Security-analysis facts MUST be modeled: `hasExecutionRole` relating any resource to the IAM role it runs as (sub-property of `uses`); `hasInstanceProfile` relating an EC2 instance to its IAM instance profile (sub-property of `attachedTo`); resource tags as a `Tag` class (disjoint with `AWSResource`) with `hasTag`, `tagKey` and `tagValue`; `accessLevel` on API actions using AWS's five access levels (List, Read, Write, Permissions management, Tagging); and `isPubliclyAccessible` on resources. SHACL shapes MUST enforce the AWS limits these imply: at most one execution role per Lambda function (warning when none), one instance profile per EC2 instance, one role per instance profile, at most 50 tags per resource, tag keys of 1-128 and values of 0-256 characters, and access levels from the five-level set |
 
 ## 6. Output Format
 
