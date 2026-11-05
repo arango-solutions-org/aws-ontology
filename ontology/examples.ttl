@@ -63,6 +63,7 @@
     :hasPolicyAttachment :EC2BasicAccessPolicy ;
     :hasTrustRelationship :EC2TrustPolicy ;
     :maxSessionDuration "3600"^^xsd:integer ;
+    :canList :WebServerInstance ;
     :hasEffectiveAccess :WebServerInstance ;
     :isAdministrator "false"^^xsd:boolean .
 
@@ -71,7 +72,9 @@
     :arn "arn:aws:iam::123456789012:role/LambdaExecutionRole" ;
     :hasPolicyAttachment :LambdaBasicExecution, :S3ReadOnlyAccess ;
     :hasTrustRelationship :LambdaTrustPolicy ;
+    :canList :CompanyArtifacts ;
     :canRead :CompanyArtifacts ;
+    :hasEffectiveAccess :CompanyArtifacts ;
     :isAdministrator "false"^^xsd:boolean .
 
 # Example Managed Policies
@@ -1429,6 +1432,9 @@
     :arn "arn:aws:iam::123456789012:role/BreakGlassAdminRole" ;
     :hasPolicyAttachment :AdministratorAccessPolicy ;
     :isAdministrator "true"^^xsd:boolean ;
+    :canList :CompanyArtifacts ;
     :canRead :CompanyArtifacts ;
     :canWrite :CompanyArtifacts ;
-    :canManagePermissions :CompanyArtifacts .
+    :canManagePermissions :CompanyArtifacts ;
+    :canTag :CompanyArtifacts ;
+    :hasEffectiveAccess :CompanyArtifacts .

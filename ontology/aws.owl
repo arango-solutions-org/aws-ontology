@@ -1356,28 +1356,34 @@
     <rdfs:label>can assume role</rdfs:label>
     <rdfs:range rdf:resource="https://w3id.org/arango-solutions/aws-ontology#IAMRole"/>
   </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#canList">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:comment>Derived: the principal is effectively allowed at least one List access-level action on the resource (e.g. s3:ListBucket, ec2:DescribeInstances)</rdfs:comment>
+    <rdfs:label>can list</rdfs:label>
+    <rdfs:subPropertyOf rdf:resource="https://w3id.org/arango-solutions/aws-ontology#hasEffectiveAccess"/>
+  </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#canManagePermissions">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdfs:comment>Derived: the identity is effectively allowed at least one Permissions management access-level action on the resource (e.g. s3:PutBucketPolicy, iam:AttachRolePolicy), so it can change who else has access</rdfs:comment>
-    <rdfs:domain rdf:resource="https://w3id.org/arango-solutions/aws-ontology#IAMIdentity"/>
+    <rdfs:comment>Derived: the principal is effectively allowed at least one Permissions management access-level action on the resource (e.g. s3:PutBucketPolicy, iam:AttachRolePolicy), so it can change who else has access</rdfs:comment>
     <rdfs:label>can manage permissions</rdfs:label>
-    <rdfs:range rdf:resource="https://w3id.org/arango-solutions/aws-ontology#AWSResource"/>
     <rdfs:subPropertyOf rdf:resource="https://w3id.org/arango-solutions/aws-ontology#hasEffectiveAccess"/>
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#canRead">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdfs:comment>Derived: the identity is effectively allowed at least one Read access-level action on the resource (e.g. s3:GetObject)</rdfs:comment>
-    <rdfs:domain rdf:resource="https://w3id.org/arango-solutions/aws-ontology#IAMIdentity"/>
+    <rdfs:comment>Derived: the principal is effectively allowed at least one Read access-level action on the resource (e.g. s3:GetObject)</rdfs:comment>
     <rdfs:label>can read</rdfs:label>
-    <rdfs:range rdf:resource="https://w3id.org/arango-solutions/aws-ontology#AWSResource"/>
+    <rdfs:subPropertyOf rdf:resource="https://w3id.org/arango-solutions/aws-ontology#hasEffectiveAccess"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#canTag">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:comment>Derived: the principal is effectively allowed at least one Tagging access-level action on the resource (e.g. s3:PutBucketTagging, ec2:CreateTags). Tags can drive attribute-based access control, so tagging can change access</rdfs:comment>
+    <rdfs:label>can tag</rdfs:label>
     <rdfs:subPropertyOf rdf:resource="https://w3id.org/arango-solutions/aws-ontology#hasEffectiveAccess"/>
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#canWrite">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdfs:comment>Derived: the identity is effectively allowed at least one Write access-level action on the resource (e.g. s3:PutObject, s3:DeleteObject)</rdfs:comment>
-    <rdfs:domain rdf:resource="https://w3id.org/arango-solutions/aws-ontology#IAMIdentity"/>
+    <rdfs:comment>Derived: the principal is effectively allowed at least one Write access-level action on the resource (e.g. s3:PutObject, s3:DeleteObject)</rdfs:comment>
     <rdfs:label>can write</rdfs:label>
-    <rdfs:range rdf:resource="https://w3id.org/arango-solutions/aws-ontology#AWSResource"/>
     <rdfs:subPropertyOf rdf:resource="https://w3id.org/arango-solutions/aws-ontology#hasEffectiveAccess"/>
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#chargedBy">
@@ -1873,8 +1879,8 @@
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#hasEffectiveAccess">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdfs:comment>Derived: after policy evaluation, the identity is allowed at least one action on the resource. For a group, this is the access its members inherit through it. Not an AWS attribute; computed from policies, boundaries, SCPs and role assumption.</rdfs:comment>
-    <rdfs:domain rdf:resource="https://w3id.org/arango-solutions/aws-ontology#IAMIdentity"/>
+    <rdfs:comment>Derived: after policy evaluation, the principal is allowed at least one action on the resource. For an IAM group, this is the access its members inherit through it. Not an AWS attribute; computed from policies, boundaries, SCPs and role assumption.</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/arango-solutions/aws-ontology#AWSResource"/>
     <rdfs:label>has effective access</rdfs:label>
     <rdfs:range rdf:resource="https://w3id.org/arango-solutions/aws-ontology#AWSResource"/>
   </rdf:Description>
@@ -2276,6 +2282,7 @@
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#isAdministrator">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
     <rdfs:comment>Derived: whether the user's or role's effective permissions amount to full administrative access (e.g. Allow * on *, as granted by the AWS managed policy AdministratorAccess)</rdfs:comment>
     <rdfs:domain rdf:resource="https://w3id.org/arango-solutions/aws-ontology#IAMEntity"/>
     <rdfs:label>is administrator</rdfs:label>

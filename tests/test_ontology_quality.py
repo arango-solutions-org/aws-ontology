@@ -161,9 +161,15 @@ class TestOntologyQuality(BaseOntologyTest):
             ):
                 continue
 
-            # Most properties should have at least a domain or range
+            # Most properties should have at least a domain or range, declared directly or
+            # inherited from a super-property (rdfs:subPropertyOf passes domain/range down).
+            inherited = any(
+                (sup, RDFS.domain, None) in self.graph or (sup, RDFS.range, None) in self.graph
+                for sup in self.graph.transitive_objects(prop, RDFS.subPropertyOf)
+            )
             self.assertTrue(
-                len(domains) > 0 or len(ranges) > 0, f"Property {prop} has neither domain nor range"
+                len(domains) > 0 or len(ranges) > 0 or inherited,
+                f"Property {prop} has neither domain nor range (declared or inherited)",
             )
 
     def test_class_hierarchy_consistency(self):

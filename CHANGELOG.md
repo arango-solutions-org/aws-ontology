@@ -29,17 +29,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     the order-processing Step Functions state machine now use `hasExecutionRole`; the web server
     has an instance profile, tags and `isPubliclyAccessible true`; 12 example actions carry their
     access level from the Service Authorization Reference.
-
 - **Derived access relationships** for recording the result of IAM
   [policy evaluation](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html).
   These are computed, not stored by AWS:
-  - `hasEffectiveAccess` (`IAMIdentity` → `AWSResource`) with sub-properties `canRead`,
-    `canWrite` and `canManagePermissions`, matching AWS's Read, Write and Permissions management
-    access levels.
-  - `isAdministrator` (`IAMEntity` → `xsd:boolean`), checked by `AdministratorFlagShape`.
-  - Examples: the Lambda execution role can read the artifacts bucket, the EC2 service role has
-    (List-level) access to the web server, and a new break-glass role with `AdministratorAccess`
-    can read, write and manage permissions on the bucket.
+  - `hasEffectiveAccess` (`AWSResource` → `AWSResource`) with one sub-property per AWS access
+    level: `canList`, `canRead`, `canWrite`, `canManagePermissions` and `canTag`, matching the
+    five values of `accessLevel`. The sub-properties inherit the domain and range. The domain is
+    `AWSResource` rather than `IAMIdentity` because access is also reported for principals that
+    aren't IAM identities: Identity Center users, external AWS accounts, and resources acting
+    through their execution role.
+  - `isAdministrator` (`IAMEntity` → `xsd:boolean`, functional), checked by
+    `AdministratorFlagShape`.
+  - Examples assert `hasEffectiveAccess` alongside each specific level, so queries and graph
+    imports that don't apply RDFS reasoning still find the access. The Lambda execution role can
+    list and read the artifacts bucket, the EC2 service role can list the web server, and a new
+    break-glass role with `AdministratorAccess` has all five access levels on the bucket.
 
 ## [0.6.0] - 2026-10-26
 
