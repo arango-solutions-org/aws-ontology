@@ -1886,7 +1886,7 @@
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#hasExecutionRole">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdfs:comment>The IAM role a resource runs as, granting it permissions to call AWS services (e.g. a Lambda function's execution role, which Lambda assumes when the function is invoked). See https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html</rdfs:comment>
+    <rdfs:comment>The IAM role the resource itself uses to call AWS services (e.g. a Lambda function's execution role, which Lambda assumes when the function is invoked). Not a role an AWS service uses only to operate the resource on its behalf: for ECS, record the task role on the task definition (taskRoleArn), not the task execution role the ECS agent uses to pull images and write logs. See https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html</rdfs:comment>
     <rdfs:domain rdf:resource="https://w3id.org/arango-solutions/aws-ontology#AWSResource"/>
     <rdfs:label>has execution role</rdfs:label>
     <rdfs:range rdf:resource="https://w3id.org/arango-solutions/aws-ontology#IAMRole"/>

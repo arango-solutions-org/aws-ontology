@@ -9,26 +9,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Identity attachments, tags and exposure** for security and access analysis:
-  - `hasExecutionRole` (`AWSResource` → `IAMRole`, sub-property of `uses`): the role a
-    resource runs as, e.g. a Lambda function's
+  - `hasExecutionRole` (`AWSResource` → `IAMRole`, sub-property of `uses`): the role the
+    resource itself uses to call AWS services, e.g. a Lambda function's
     [execution role](https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html).
+    Not a role an AWS service uses only to operate the resource: for ECS, the task definition's
+    task role, not the task execution role the ECS agent uses.
     The domain is `AWSResource` rather than `ComputeResource` because resources in categories
-    disjoint with compute (SageMaker training jobs, Glue jobs, EventBridge rules, ...) also run as
-    roles. `LambdaFunctionShape` allows at most one execution role and warns when one is missing.
+    disjoint with compute (SageMaker training jobs, Glue jobs, EventBridge rules invoking their
+    targets, ...) also act with their own roles. `LambdaFunctionShape` allows at most one
+    execution role and warns when one is missing.
   - `hasInstanceProfile` (`EC2Instance` → `IAMInstanceProfile`, sub-property of `attachedTo`).
     AWS allows [one role per instance](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html):
     `EC2InstanceShape` allows one instance profile per instance and `IAMInstanceProfileShape`
     one role per instance profile.
   - `Tag` class with `hasTag` (`AWSResource` → `Tag`), `tagKey` and `tagValue`. `Tag` is
     disjoint with `AWSResource` (tags have no ARN). `TagShape` checks AWS's 128/256-character
-    key/value limits and `TaggedResourceShape` the 50-tags-per-resource limit.
+    key/value limits and `TaggedResourceShape` the limit of 50 user-applied tags per resource
+    (system tags with `aws:` keys don't count).
   - `accessLevel` on `Action`: AWS's [access level](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_understand-policy-summary-access-level-summaries.html)
     for an API action (List, Read, Write, Permissions management, Tagging), checked by `ActionShape`.
   - `isPubliclyAccessible` (`AWSResource` → `xsd:boolean`).
-  - Examples: the user-management Lambda, the ECS web application service, the EKS node group and
-    the order-processing Step Functions state machine now use `hasExecutionRole`; the web server
-    has an instance profile, tags and `isPubliclyAccessible true`; 12 example actions carry their
-    access level from the Service Authorization Reference.
+  - Examples: the user-management Lambda, the EKS node group and the order-processing Step
+    Functions state machine now use `hasExecutionRole`; the web server has an instance profile,
+    tags and `isPubliclyAccessible true`; 12 example actions carry their access level from the
+    Service Authorization Reference.
 - **Derived access relationships** for recording the result of IAM
   [policy evaluation](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html).
   These are computed, not stored by AWS:
@@ -44,6 +48,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     imports that don't apply RDFS reasoning still find the access. The Lambda execution role can
     list and read the artifacts bucket, the EC2 service role can list the web server, and a new
     break-glass role with `AdministratorAccess` has all five access levels on the bucket.
+- **PRD v2.2**: new REQ-042 (security-analysis relationships), REQ-043 (`Tag` class) and REQ-044
+  (the SHACL limits behind them), covering the additions above.
 
 ## [0.6.0] - 2026-10-26
 
