@@ -54,6 +54,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   access level in the examples is paired with `hasEffectiveAccess`; REQ-019 now requires the
   RDF/XML to be generated deterministically (byte-identical to the generator's output), which
   `tests/test_format_sync.py` already enforces.
+- **`hasTaskExecutionRole`** (`ECSTaskDefinition` → `IAMRole`, sub-property of `uses`): the
+  [task execution role](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html)
+  the ECS agent uses to pull images and write logs, kept distinct from the task role the task's own
+  code uses (`hasExecutionRole`). The ECS example now records both on its task definition, with a
+  new `WebApplicationTaskRole`. PRD v2.4 adds it to REQ-042.
+
+### Fixed
+- **REQ-016: every property now has a domain and a range** (generic and inverse properties
+  excepted). Added domains to `belongsToRegion`, `belongsToVPC`, `publishesToTopic`,
+  `sendsToQueue`, `triggersStepFunction`, `usesContainerImage` (`AWSResource`) and `runsPod`
+  (`ComputeResource`), and ranges to `integrationWith`, `routesEventTo`, `routesTrafficThrough`,
+  `compliesWith`, `violates` and `enforces` (`AWSResource`). `test_domain_range_consistency` now
+  requires both, declared or carried over from a super- or equivalent property, for object and
+  datatype properties; before, either one was enough, which is how these gaps went unnoticed.
+- **`usesFargate` is now a boolean datatype property.** It was declared an object property but
+  only ever used with `true`, which is not valid OWL 2 DL.
+- **`integrationWith` example.** The examples also asserted it on the API Gateway itself, so a
+  reasoner classified the gateway as an `APIGatewayMethod` (the property's domain). The
+  integrations stay on the methods.
 
 ## [0.6.0] - 2026-10-26
 

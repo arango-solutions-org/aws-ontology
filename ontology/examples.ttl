@@ -393,10 +393,15 @@
     :arn "arn:aws:iam::123456789012:role/EKSNodeInstanceRole" ;
     :hasPolicyAttachment :AmazonEKSWorkerNodePolicy, :AmazonEKS_CNI_Policy, :AmazonEC2ContainerRegistryReadOnly .
 
-# The ECS task execution role is used by the ECS agent (pulling images, writing logs), not by
-# the task's own code, so it isn't a hasExecutionRole. The task's own role is the task role,
-# recorded on the task definition (taskRoleArn).
-:WebApplicationService :uses :ECSTaskExecutionRole .
+# ECS task definitions carry two roles. The task execution role (executionRoleArn) is used by
+# the ECS agent to pull images and write logs; the task role (taskRoleArn) is what the task's
+# own code runs as, so only the task role is a hasExecutionRole.
+:WebApplicationTaskDefinition :hasTaskExecutionRole :ECSTaskExecutionRole ;
+    :hasExecutionRole :WebApplicationTaskRole .
+
+:WebApplicationTaskRole rdf:type :IAMRole ;
+    rdfs:label "Web Application Task Role" ;
+    :arn "arn:aws:iam::123456789012:role/WebApplicationTaskRole" .
 :ProductionEKSCluster :uses :EKSServiceRole .
 :PrimaryNodeGroup :hasExecutionRole :EKSNodeInstanceRole .
 
@@ -638,7 +643,7 @@
     :messageRetentionPeriod 604800 .
 
 # Integration Relationships
-:ProductionAPIGateway :integrationWith :UserLambdaFunction, :OrderProcessingStepFunction .
+# (API Gateway integrations are recorded on the methods; integrationWith's domain is APIGatewayMethod.)
 :OrderProcessingStepFunction :triggersStepFunction :UserWorkflowStepFunction .
 :ProductionEventBridge :routesEventTo :OrderNotificationTopic, :UserEventsTopic, :OrderProcessingQueue .
 

@@ -1,6 +1,6 @@
 # AWS Object and Relationship Ontology Development - Product Requirements Document
 
-**Document Version:** 2.3
+**Document Version:** 2.4
 **Date:** November 2026
 
 > **Requirement identifiers.** Every testable requirement in this document carries a stable
@@ -95,7 +95,7 @@ implemented ontology may exceed this list.
 | REQ-013 | Dependency properties MUST exist: `dependsOn` (general), `isSourceFor` (e.g., snapshot → volume) |
 | REQ-014 | Inverse properties MUST be defined where semantically meaningful |
 | REQ-024 | Specific relationships that are semantically special cases of a generic cross-cutting property (REQ-016's exemption list) MUST be declared `rdfs:subPropertyOf` that generic property, so transitive/general-purpose queries over the generic property also match the specific ones |
-| REQ-042 | Security-analysis relationships MUST exist: `hasExecutionRole` relating a resource to the IAM role the resource itself uses to call AWS services (sub-property of `uses`; e.g. a Lambda function's execution role, a Step Functions state machine's role, or an ECS task definition's task role), not a role an AWS service uses only to operate the resource on its behalf, such as the ECS task execution role; `hasInstanceProfile` relating an EC2 instance to its IAM instance profile (sub-property of `attachedTo`); `hasTag` relating a resource to its tags (REQ-043); `accessLevel` on API actions using AWS's five access levels (List, Read, Write, Permissions management, Tagging); and `isPubliclyAccessible` on resources |
+| REQ-042 | Security-analysis relationships MUST exist: `hasExecutionRole` relating a resource to the IAM role the resource itself uses to call AWS services (sub-property of `uses`; e.g. a Lambda function's execution role, a Step Functions state machine's role, or an ECS task definition's task role), not a role an AWS service uses only to operate the resource on its behalf, such as the ECS task execution role; `hasTaskExecutionRole` relating an ECS task definition to that task execution role (sub-property of `uses`), so it stays distinguishable from the task's own role; `hasInstanceProfile` relating an EC2 instance to its IAM instance profile (sub-property of `attachedTo`); `hasTag` relating a resource to its tags (REQ-043); `accessLevel` on API actions using AWS's five access levels (List, Read, Write, Permissions management, Tagging); and `isPubliclyAccessible` on resources |
 | REQ-045 | Derived access relationships MUST exist for recording the results of IAM policy evaluation, which are computed facts rather than AWS attributes: `hasEffectiveAccess` from a principal to a resource, with one sub-property per AWS access level (`canList`, `canRead`, `canWrite`, `canManagePermissions`, `canTag`), and a functional boolean `isAdministrator` on IAM users and roles. Data MUST assert `hasEffectiveAccess` alongside each specific access level, so consumers that don't apply RDFS reasoning still find the access |
 
 ## 6. Output Format
