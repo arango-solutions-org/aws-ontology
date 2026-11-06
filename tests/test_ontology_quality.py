@@ -100,15 +100,29 @@ class TestOntologyQuality(BaseOntologyTest):
             len(missing_comments), 0, f"Properties missing comments: {missing_comments}"
         )
 
+    def declares(self, prop, predicate) -> bool:
+        """Whether prop has a domain/range, directly or via a super- or equivalent property.
+
+        Both rdfs:subPropertyOf and owl:equivalentProperty carry domain and range over under
+        RDFS/OWL semantics, so a declaration there counts.
+        """
+        related = set(self.graph.transitive_objects(prop, RDFS.subPropertyOf))
+        for other in list(related):
+            related |= set(self.graph.objects(other, OWL.equivalentProperty))
+            related |= set(self.graph.subjects(OWL.equivalentProperty, other))
+        return any((other, predicate, None) in self.graph for other in related)
+
     def test_domain_range_consistency(self):
-        """Test that domain and range declarations are consistent."""
-        obj_props = list(self.graph.subjects(RDF.type, OWL.ObjectProperty))
+        """REQ-016: properties specify both rdfs:domain and rdfs:range.
 
-        # Check object properties have appropriate domains and ranges
-        for prop in obj_props:
-            domains = list(self.graph.objects(prop, RDFS.domain))
-            ranges = list(self.graph.objects(prop, RDFS.range))
+        Deliberately generic properties and inverse properties (whose domain and range follow
+        from their inverse) are exempt.
+        """
+        props = list(self.graph.subjects(RDF.type, OWL.ObjectProperty)) + list(
+            self.graph.subjects(RDF.type, OWL.DatatypeProperty)
+        )
 
+        for prop in props:
             # Skip properties that intentionally have no domain/range restrictions
             # or are inverse properties where domain/range can be inferred
             prop_name = str(prop).split("#")[-1]
@@ -161,15 +175,11 @@ class TestOntologyQuality(BaseOntologyTest):
             ):
                 continue
 
-            # Most properties should have at least a domain or range, declared directly or
-            # inherited from a super-property (rdfs:subPropertyOf passes domain/range down).
-            inherited = any(
-                (sup, RDFS.domain, None) in self.graph or (sup, RDFS.range, None) in self.graph
-                for sup in self.graph.transitive_objects(prop, RDFS.subPropertyOf)
+            self.assertTrue(
+                self.declares(prop, RDFS.domain), f"Property {prop_name} has no rdfs:domain"
             )
             self.assertTrue(
-                len(domains) > 0 or len(ranges) > 0 or inherited,
-                f"Property {prop} has neither domain nor range (declared or inherited)",
+                self.declares(prop, RDFS.range), f"Property {prop_name} has no rdfs:range"
             )
 
     def test_class_hierarchy_consistency(self):
@@ -315,7 +325,6 @@ class TestOntologyQuality(BaseOntologyTest):
             "storedInRepository",
             "hasNodeGroup",
             "runsPod",
-            "usesFargate",
         ]
 
         existing_properties = [
@@ -340,6 +349,7 @@ class TestOntologyQuality(BaseOntologyTest):
             "kubernetesVersion",
             "nodeInstanceType",
             "imageTag",
+            "usesFargate",
         ]
 
         existing_data_properties = [
