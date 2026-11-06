@@ -201,6 +201,24 @@ class TestExamplesValidation(BaseOntologyTest):
                         f"Broken reference: {s} {p} {o} - {o} not found as subject",
                     )
 
+    def test_effective_access_levels_pair_with_parent(self):
+        """REQ-045: each specific access level is asserted alongside hasEffectiveAccess.
+
+        Consumers that don't apply RDFS reasoning (SPARQL without entailment, the ArangoDB
+        import) only find access recorded through the parent property.
+        """
+        parent = self.aws["hasEffectiveAccess"]
+        levels = set(self.ontology.transitive_subjects(RDFS.subPropertyOf, parent)) - {parent}
+        self.assertGreaterEqual(len(levels), 5, "Expected one sub-property per access level")
+
+        unpaired = [
+            (s, level, o)
+            for level in levels
+            for s, o in self.examples.subject_objects(level)
+            if (s, parent, o) not in self.examples
+        ]
+        self.assertEqual(unpaired, [], "Access levels asserted without hasEffectiveAccess")
+
     def test_consistent_labeling(self):
         """Test that examples have consistent labeling."""
         # All instances should have labels

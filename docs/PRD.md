@@ -1,6 +1,6 @@
 # AWS Object and Relationship Ontology Development - Product Requirements Document
 
-**Document Version:** 2.2
+**Document Version:** 2.3
 **Date:** November 2026
 
 > **Requirement identifiers.** Every testable requirement in this document carries a stable
@@ -96,6 +96,7 @@ implemented ontology may exceed this list.
 | REQ-014 | Inverse properties MUST be defined where semantically meaningful |
 | REQ-024 | Specific relationships that are semantically special cases of a generic cross-cutting property (REQ-016's exemption list) MUST be declared `rdfs:subPropertyOf` that generic property, so transitive/general-purpose queries over the generic property also match the specific ones |
 | REQ-042 | Security-analysis relationships MUST exist: `hasExecutionRole` relating a resource to the IAM role the resource itself uses to call AWS services (sub-property of `uses`; e.g. a Lambda function's execution role, a Step Functions state machine's role, or an ECS task definition's task role), not a role an AWS service uses only to operate the resource on its behalf, such as the ECS task execution role; `hasInstanceProfile` relating an EC2 instance to its IAM instance profile (sub-property of `attachedTo`); `hasTag` relating a resource to its tags (REQ-043); `accessLevel` on API actions using AWS's five access levels (List, Read, Write, Permissions management, Tagging); and `isPubliclyAccessible` on resources |
+| REQ-045 | Derived access relationships MUST exist for recording the results of IAM policy evaluation, which are computed facts rather than AWS attributes: `hasEffectiveAccess` from a principal to a resource, with one sub-property per AWS access level (`canList`, `canRead`, `canWrite`, `canManagePermissions`, `canTag`), and a functional boolean `isAdministrator` on IAM users and roles. Data MUST assert `hasEffectiveAccess` alongside each specific access level, so consumers that don't apply RDFS reasoning still find the access |
 
 ## 6. Output Format
 
@@ -105,7 +106,7 @@ implemented ontology may exceed this list.
 | REQ-016 | Properties MUST specify `rdfs:domain` and `rdfs:range`, EXCEPT deliberately generic properties (`contains`, `uses`, `dependsOn`, and similar cross-cutting relations) where broad applicability is intended |
 | REQ-017 | Every class and property MUST have an `rdfs:label` and `rdfs:comment` |
 | REQ-018 | The ontology MUST ship with at least 50 example instances spanning all major service categories |
-| REQ-019 | The ontology MUST be published in two synchronized serializations (Turtle, the editing source, and RDF/XML generated from it) verified semantically identical |
+| REQ-019 | The ontology MUST be published in two synchronized serializations: Turtle, the editing source, and RDF/XML generated from it deterministically, so the committed RDF/XML is byte-identical to the generator's output and changes only where the ontology does. Both MUST be verified semantically identical |
 | REQ-025 | The ontology MUST ship SHACL shapes (`ontology/aws.shapes.ttl`) providing closed-world validation of instance data where OWL's open-world semantics cannot flag a specific individual as non-conforming |
 | REQ-044 | SHACL shapes MUST enforce the AWS limits behind REQ-042 and REQ-043: at most one execution role per Lambda function (warning when none), at most one instance profile per EC2 instance, at most one role per instance profile, at most 50 user-applied tags per resource (system tags, whose keys start with `aws:`, don't count), tag keys of 1-128 and values of 0-256 characters, access levels from the five-level set, and a single boolean `isPubliclyAccessible` |
 | REQ-026 | The ontology MUST align with PROV-O (`AWSResource rdfs:subClassOf prov:Entity`, model-invocation-style events as `prov:Activity`) to support provenance-chain queries, without importing PROV-O's full axiomatization (avoids a network-fetch dependency at load time) |

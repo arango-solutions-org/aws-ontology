@@ -50,6 +50,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     break-glass role with `AdministratorAccess` has all five access levels on the bucket.
 - **PRD v2.2**: new REQ-042 (security-analysis relationships), REQ-043 (`Tag` class) and REQ-044
   (the SHACL limits behind them), covering the additions above.
+- **PRD v2.3**: new REQ-045 (derived access relationships), with a test that every specific
+  access level in the examples is paired with `hasEffectiveAccess`; REQ-019 now requires the
+  RDF/XML to be generated deterministically (byte-identical to the generator's output), which
+  `tests/test_format_sync.py` already enforces.
 
 ## [0.6.0] - 2026-10-26
 
