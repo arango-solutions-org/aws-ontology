@@ -168,11 +168,13 @@
 :belongsToRegion a owl:ObjectProperty ;
     rdfs:label "belongs to region" ;
     rdfs:comment "Relates resources to the AWS region they reside in" ;
+    rdfs:domain :AWSResource ;
     rdfs:range :AWSRegion .
 
 :belongsToVPC a owl:ObjectProperty ;
     rdfs:label "belongs to VPC" ;
     rdfs:comment "Relates resources to their VPC" ;
+    rdfs:domain :AWSResource ;
     rdfs:range :VPC .
 
 :canAssumeRole a owl:ObjectProperty ;
@@ -233,8 +235,9 @@
 
 :compliesWith a owl:ObjectProperty ;
     rdfs:label "complies with" ;
-    rdfs:comment "Indicates compliance with standards, regulations, or policies" ;
-    rdfs:domain :AWSResource .
+    rdfs:comment "Indicates compliance with a standard, rule or policy as modeled in AWS (e.g. a Config rule, conformance pack, Security Hub standard or IAM policy)" ;
+    rdfs:domain :AWSResource ;
+    rdfs:range :AWSResource .
 
 :containedBy a owl:ObjectProperty ;
     rdfs:label "contained by" ;
@@ -436,7 +439,8 @@
 :integrationWith a owl:ObjectProperty ;
     rdfs:label "integration with" ;
     rdfs:comment "Indicates integration between API Gateway methods and backend services" ;
-    rdfs:domain :APIGatewayMethod .
+    rdfs:domain :APIGatewayMethod ;
+    rdfs:range :AWSResource .
 
 :isDefault a owl:DatatypeProperty ;
     rdfs:label "is default" ;
@@ -667,7 +671,8 @@
 :routesTrafficThrough a owl:ObjectProperty ;
     rdfs:label "routes traffic through" ;
     rdfs:comment "Indicates traffic routing relationships" ;
-    rdfs:domain :RouteTable .
+    rdfs:domain :RouteTable ;
+    rdfs:range :AWSResource .
 
 :ruleOf a owl:ObjectProperty ;
     rdfs:label "rule of" ;
@@ -754,15 +759,17 @@
     rdfs:comment "Inverse of uses" ;
     owl:inverseOf :uses .
 
-:usesFargate a owl:ObjectProperty ;
+:usesFargate a owl:DatatypeProperty ;
     rdfs:label "uses Fargate" ;
-    rdfs:comment "Indicates that a service uses AWS Fargate for serverless containers" ;
-    rdfs:domain :ECSService .
+    rdfs:comment "Whether the service runs its tasks on AWS Fargate (serverless containers) rather than on EC2 instances" ;
+    rdfs:domain :ECSService ;
+    rdfs:range xsd:boolean .
 
 :violates a owl:ObjectProperty ;
     rdfs:label "violates" ;
-    rdfs:comment "Indicates compliance violations" ;
-    rdfs:domain :AWSResource .
+    rdfs:comment "Indicates that a resource violates a standard, rule or policy as modeled in AWS (e.g. a Config rule, conformance pack, Security Hub standard or IAM policy)" ;
+    rdfs:domain :AWSResource ;
+    rdfs:range :AWSResource .
 
 :visibilityTimeoutSeconds a owl:DatatypeProperty ;
     rdfs:label "visibility timeout seconds" ;
@@ -925,8 +932,9 @@
 
 :enforces a owl:ObjectProperty ;
     rdfs:label "enforces" ;
-    rdfs:comment "Indicates that a resource enforces compliance rules" ;
-    rdfs:domain :AWSResource .
+    rdfs:comment "Indicates that a resource enforces compliance rules on another resource (e.g. a WAF web ACL or service control policy)" ;
+    rdfs:domain :AWSResource ;
+    rdfs:range :AWSResource .
 
 :hasAvailabilityZone a owl:ObjectProperty ;
     rdfs:label "has availability zone" ;
@@ -1023,6 +1031,7 @@
 :publishesToTopic a owl:ObjectProperty ;
     rdfs:label "publishes to topic" ;
     rdfs:comment "Indicates that a service publishes messages to an SNS topic" ;
+    rdfs:domain :AWSResource ;
     rdfs:range :SNSTopic .
 
 :replacedBy a owl:ObjectProperty ;
@@ -1040,16 +1049,19 @@
 :routesEventTo a owl:ObjectProperty ;
     rdfs:label "routes event to" ;
     rdfs:comment "Indicates event routing from EventBridge to target services" ;
-    rdfs:domain :EventBridge .
+    rdfs:domain :EventBridge ;
+    rdfs:range :AWSResource .
 
 :runsPod a owl:ObjectProperty ;
     rdfs:label "runs pod" ;
     rdfs:comment "Relates EKS node groups or clusters to their pods" ;
+    rdfs:domain :ComputeResource ;
     rdfs:range :EKSPod .
 
 :sendsToQueue a owl:ObjectProperty ;
     rdfs:label "sends to queue" ;
     rdfs:comment "Indicates that a service sends messages to an SQS queue" ;
+    rdfs:domain :AWSResource ;
     rdfs:range :SQSQueue .
 
 :subscribesTo a owl:ObjectProperty ;
@@ -1066,6 +1078,7 @@
 :triggersStepFunction a owl:ObjectProperty ;
     rdfs:label "triggers step function" ;
     rdfs:comment "Indicates that a service triggers a Step Function execution" ;
+    rdfs:domain :AWSResource ;
     rdfs:range :StepFunction .
 
 :uses a owl:ObjectProperty ;
@@ -1075,6 +1088,7 @@
 :usesContainerImage a owl:ObjectProperty ;
     rdfs:label "uses container image" ;
     rdfs:comment "Relates container services to their container images" ;
+    rdfs:domain :AWSResource ;
     rdfs:range :ContainerImage .
 
 :APIGatewayStage a owl:Class ;
@@ -2753,6 +2767,13 @@
     rdfs:comment "The IAM role the resource itself uses to call AWS services (e.g. a Lambda function's execution role, which Lambda assumes when the function is invoked). Not a role an AWS service uses only to operate the resource on its behalf: for ECS, record the task role on the task definition (taskRoleArn), not the task execution role the ECS agent uses to pull images and write logs. See https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html" ;
     rdfs:subPropertyOf :uses ;
     rdfs:domain :AWSResource ;
+    rdfs:range :IAMRole .
+
+:hasTaskExecutionRole a owl:ObjectProperty ;
+    rdfs:label "has task execution role" ;
+    rdfs:comment "The IAM role the ECS agent uses on a task definition's behalf to pull container images and write logs (executionRoleArn). Distinct from the task role the task's own code uses, which is its hasExecutionRole. See https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html" ;
+    rdfs:subPropertyOf :uses ;
+    rdfs:domain :ECSTaskDefinition ;
     rdfs:range :IAMRole .
 
 :hasInstanceProfile a owl:ObjectProperty ;

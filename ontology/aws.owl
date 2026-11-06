@@ -1312,12 +1312,14 @@
   <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#belongsToRegion">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
     <rdfs:comment>Relates resources to the AWS region they reside in</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/arango-solutions/aws-ontology#AWSResource"/>
     <rdfs:label>belongs to region</rdfs:label>
     <rdfs:range rdf:resource="https://w3id.org/arango-solutions/aws-ontology#AWSRegion"/>
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#belongsToVPC">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
     <rdfs:comment>Relates resources to their VPC</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/arango-solutions/aws-ontology#AWSResource"/>
     <rdfs:label>belongs to VPC</rdfs:label>
     <rdfs:range rdf:resource="https://w3id.org/arango-solutions/aws-ontology#VPC"/>
   </rdf:Description>
@@ -1425,9 +1427,10 @@
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#compliesWith">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdfs:comment>Indicates compliance with standards, regulations, or policies</rdfs:comment>
+    <rdfs:comment>Indicates compliance with a standard, rule or policy as modeled in AWS (e.g. a Config rule, conformance pack, Security Hub standard or IAM policy)</rdfs:comment>
     <rdfs:domain rdf:resource="https://w3id.org/arango-solutions/aws-ontology#AWSResource"/>
     <rdfs:label>complies with</rdfs:label>
+    <rdfs:range rdf:resource="https://w3id.org/arango-solutions/aws-ontology#AWSResource"/>
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#connectionBandwidth">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
@@ -1689,9 +1692,10 @@
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#enforces">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdfs:comment>Indicates that a resource enforces compliance rules</rdfs:comment>
+    <rdfs:comment>Indicates that a resource enforces compliance rules on another resource (e.g. a WAF web ACL or service control policy)</rdfs:comment>
     <rdfs:domain rdf:resource="https://w3id.org/arango-solutions/aws-ontology#AWSResource"/>
     <rdfs:label>enforces</rdfs:label>
+    <rdfs:range rdf:resource="https://w3id.org/arango-solutions/aws-ontology#AWSResource"/>
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#engine">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
@@ -2151,6 +2155,14 @@
     <rdfs:range rdf:resource="https://w3id.org/arango-solutions/aws-ontology#ECSTaskDefinition"/>
     <rdfs:subPropertyOf rdf:resource="https://w3id.org/arango-solutions/aws-ontology#contains"/>
   </rdf:Description>
+  <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#hasTaskExecutionRole">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:comment>The IAM role the ECS agent uses on a task definition's behalf to pull container images and write logs (executionRoleArn). Distinct from the task role the task's own code uses, which is its hasExecutionRole. See https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/arango-solutions/aws-ontology#ECSTaskDefinition"/>
+    <rdfs:label>has task execution role</rdfs:label>
+    <rdfs:range rdf:resource="https://w3id.org/arango-solutions/aws-ontology#IAMRole"/>
+    <rdfs:subPropertyOf rdf:resource="https://w3id.org/arango-solutions/aws-ontology#uses"/>
+  </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#hasTrustRelationship">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
     <rdfs:comment>Relates IAM roles to their trust policies</rdfs:comment>
@@ -2257,6 +2269,7 @@
     <rdfs:comment>Indicates integration between API Gateway methods and backend services</rdfs:comment>
     <rdfs:domain rdf:resource="https://w3id.org/arango-solutions/aws-ontology#APIGatewayMethod"/>
     <rdfs:label>integration with</rdfs:label>
+    <rdfs:range rdf:resource="https://w3id.org/arango-solutions/aws-ontology#AWSResource"/>
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#interfaceType">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
@@ -2644,6 +2657,7 @@
   <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#publishesToTopic">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
     <rdfs:comment>Indicates that a service publishes messages to an SNS topic</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/arango-solutions/aws-ontology#AWSResource"/>
     <rdfs:label>publishes to topic</rdfs:label>
     <rdfs:range rdf:resource="https://w3id.org/arango-solutions/aws-ontology#SNSTopic"/>
   </rdf:Description>
@@ -2796,12 +2810,14 @@
     <rdfs:comment>Indicates event routing from EventBridge to target services</rdfs:comment>
     <rdfs:domain rdf:resource="https://w3id.org/arango-solutions/aws-ontology#EventBridge"/>
     <rdfs:label>routes event to</rdfs:label>
+    <rdfs:range rdf:resource="https://w3id.org/arango-solutions/aws-ontology#AWSResource"/>
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#routesTrafficThrough">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
     <rdfs:comment>Indicates traffic routing relationships</rdfs:comment>
     <rdfs:domain rdf:resource="https://w3id.org/arango-solutions/aws-ontology#RouteTable"/>
     <rdfs:label>routes traffic through</rdfs:label>
+    <rdfs:range rdf:resource="https://w3id.org/arango-solutions/aws-ontology#AWSResource"/>
     <rdfs:subPropertyOf rdf:resource="https://w3id.org/arango-solutions/aws-ontology#dependsOn"/>
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#ruleOf">
@@ -2836,6 +2852,7 @@
   <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#runsPod">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
     <rdfs:comment>Relates EKS node groups or clusters to their pods</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/arango-solutions/aws-ontology#ComputeResource"/>
     <rdfs:label>runs pod</rdfs:label>
     <rdfs:range rdf:resource="https://w3id.org/arango-solutions/aws-ontology#EKSPod"/>
   </rdf:Description>
@@ -2883,6 +2900,7 @@
   <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#sendsToQueue">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
     <rdfs:comment>Indicates that a service sends messages to an SQS queue</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/arango-solutions/aws-ontology#AWSResource"/>
     <rdfs:label>sends to queue</rdfs:label>
     <rdfs:range rdf:resource="https://w3id.org/arango-solutions/aws-ontology#SQSQueue"/>
   </rdf:Description>
@@ -3089,6 +3107,7 @@
   <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#triggersStepFunction">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
     <rdfs:comment>Indicates that a service triggers a Step Function execution</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/arango-solutions/aws-ontology#AWSResource"/>
     <rdfs:label>triggers step function</rdfs:label>
     <rdfs:range rdf:resource="https://w3id.org/arango-solutions/aws-ontology#StepFunction"/>
   </rdf:Description>
@@ -3106,15 +3125,17 @@
   <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#usesContainerImage">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
     <rdfs:comment>Relates container services to their container images</rdfs:comment>
+    <rdfs:domain rdf:resource="https://w3id.org/arango-solutions/aws-ontology#AWSResource"/>
     <rdfs:label>uses container image</rdfs:label>
     <rdfs:range rdf:resource="https://w3id.org/arango-solutions/aws-ontology#ContainerImage"/>
     <rdfs:subPropertyOf rdf:resource="https://w3id.org/arango-solutions/aws-ontology#uses"/>
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#usesFargate">
-    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdfs:comment>Indicates that a service uses AWS Fargate for serverless containers</rdfs:comment>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
+    <rdfs:comment>Whether the service runs its tasks on AWS Fargate (serverless containers) rather than on EC2 instances</rdfs:comment>
     <rdfs:domain rdf:resource="https://w3id.org/arango-solutions/aws-ontology#ECSService"/>
     <rdfs:label>uses Fargate</rdfs:label>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#boolean"/>
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#usesKnowledgeBase">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
@@ -3131,9 +3152,10 @@
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#violates">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
-    <rdfs:comment>Indicates compliance violations</rdfs:comment>
+    <rdfs:comment>Indicates that a resource violates a standard, rule or policy as modeled in AWS (e.g. a Config rule, conformance pack, Security Hub standard or IAM policy)</rdfs:comment>
     <rdfs:domain rdf:resource="https://w3id.org/arango-solutions/aws-ontology#AWSResource"/>
     <rdfs:label>violates</rdfs:label>
+    <rdfs:range rdf:resource="https://w3id.org/arango-solutions/aws-ontology#AWSResource"/>
   </rdf:Description>
   <rdf:Description rdf:about="https://w3id.org/arango-solutions/aws-ontology#virtualInterfaceType">
     <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#DatatypeProperty"/>
