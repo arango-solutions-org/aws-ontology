@@ -166,9 +166,27 @@
     sh:property [
         sh:path :hasTag ;
         sh:class :Tag ;
-        sh:maxCount 50 ;
         sh:severity sh:Violation ;
-        sh:message "A resource can have at most 50 user-applied tags." ;
+        sh:message "A resource's tags must be Tag nodes." ;
+    ] ;
+    # AWS's 50-tag limit counts only user-applied tags. System tags (keys starting with aws:,
+    # e.g. aws:cloudformation:stack-name) don't count, so sh:maxCount on hasTag would reject
+    # valid data; a SPARQL constraint counts only the user tags.
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:severity sh:Violation ;
+        sh:message "A resource can have at most 50 user-applied tags (tags whose key starts with aws: are system tags and don't count)." ;
+        sh:select """
+            SELECT $this WHERE {
+                $this <https://w3id.org/arango-solutions/aws-ontology#hasTag> ?tag .
+                FILTER NOT EXISTS {
+                    ?tag <https://w3id.org/arango-solutions/aws-ontology#tagKey> ?key .
+                    FILTER(STRSTARTS(STR(?key), "aws:"))
+                }
+            }
+            GROUP BY $this
+            HAVING (COUNT(DISTINCT ?tag) > 50)
+        """ ;
     ] .
 
 :TagShape a sh:NodeShape ;
