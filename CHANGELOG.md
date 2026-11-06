@@ -9,13 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Identity attachments, tags and exposure** for security and access analysis:
-  - `hasExecutionRole` (`AWSResource` → `IAMRole`, sub-property of `uses`): the role a
-    resource's workload runs as, e.g. a Lambda function's
+  - `hasExecutionRole` (`AWSResource` → `IAMRole`, sub-property of `uses`): the role the
+    resource itself uses to call AWS services, e.g. a Lambda function's
     [execution role](https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html).
-    For ECS that is the task role, not the task execution role the ECS agent uses.
+    Not a role an AWS service uses only to operate the resource: for ECS, the task definition's
+    task role, not the task execution role the ECS agent uses.
     The domain is `AWSResource` rather than `ComputeResource` because resources in categories
-    disjoint with compute (SageMaker training jobs, Glue jobs, EventBridge rules, ...) also run as
-    roles. `LambdaFunctionShape` allows at most one execution role and warns when one is missing.
+    disjoint with compute (SageMaker training jobs, Glue jobs, EventBridge rules invoking their
+    targets, ...) also act with their own roles. `LambdaFunctionShape` allows at most one execution role and warns when one is missing.
   - `hasInstanceProfile` (`EC2Instance` → `IAMInstanceProfile`, sub-property of `attachedTo`).
     AWS allows [one role per instance](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html):
     `EC2InstanceShape` allows one instance profile per instance and `IAMInstanceProfileShape`

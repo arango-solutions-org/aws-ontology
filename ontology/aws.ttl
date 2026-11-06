@@ -2750,7 +2750,7 @@
 # Identity attachments, resource tags and exposure (security analysis)
 :hasExecutionRole a owl:ObjectProperty ;
     rdfs:label "has execution role" ;
-    rdfs:comment "The IAM role a resource's workload runs as, granting it permissions to call AWS services (e.g. a Lambda function's execution role, which Lambda assumes when the function is invoked). For ECS this is the task role, not the task execution role, which only the ECS agent uses to pull images and write logs. See https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html" ;
+    rdfs:comment "The IAM role the resource itself uses to call AWS services (e.g. a Lambda function's execution role, which Lambda assumes when the function is invoked). Not a role an AWS service uses only to operate the resource on its behalf: for ECS, record the task role on the task definition (taskRoleArn), not the task execution role the ECS agent uses to pull images and write logs. See https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html" ;
     rdfs:subPropertyOf :uses ;
     rdfs:domain :AWSResource ;
     rdfs:range :IAMRole .

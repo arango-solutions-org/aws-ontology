@@ -169,9 +169,9 @@
         sh:severity sh:Violation ;
         sh:message "A resource's tags must be Tag nodes." ;
     ] ;
-    # AWS's 50-tag limit counts only user-applied tags. System tags (keys starting with aws:,
-    # e.g. aws:cloudformation:stack-name) don't count, so sh:maxCount on hasTag would reject
-    # valid data; a SPARQL constraint counts only the user tags.
+    # AWS's 50-tag limit counts only user-applied tags. System tags (keys starting with aws:
+    # in any letter case, e.g. aws:cloudformation:stack-name) don't count, so sh:maxCount on
+    # hasTag would reject valid data; a SPARQL constraint counts only the user tags.
     sh:sparql [
         a sh:SPARQLConstraint ;
         sh:severity sh:Violation ;
@@ -181,7 +181,7 @@
                 $this <https://w3id.org/arango-solutions/aws-ontology#hasTag> ?tag .
                 FILTER NOT EXISTS {
                     ?tag <https://w3id.org/arango-solutions/aws-ontology#tagKey> ?key .
-                    FILTER(STRSTARTS(STR(?key), "aws:"))
+                    FILTER(STRSTARTS(LCASE(STR(?key)), "aws:"))
                 }
             }
             GROUP BY $this

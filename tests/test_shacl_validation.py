@@ -14,7 +14,7 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from rdflib import RDF, Graph
+from rdflib import RDF, BNode, Graph
 from rdflib.namespace import SH
 
 from utils.common import get_ontology_files, get_project_root, load_ontology_graph
@@ -95,9 +95,17 @@ class TestSecurityShapesRejectBadData(unittest.TestCase):
         cls.shapes_graph = load_ontology_graph(
             project_root / "ontology" / "aws.shapes.ttl", "turtle"
         )
+        if cls.ontology_graph is None or cls.shapes_graph is None:
+            raise RuntimeError("Failed to load the ontology or the SHACL shapes")
 
-    def results(self, turtle: str) -> set[tuple[str, str | None, str]]:
-        """Validate a data snippet; return (focus node, path, severity) local names."""
+    def shape_name(self, shape) -> str:
+        """Local name of the node shape that owns a (possibly blank-node) property shape."""
+        if isinstance(shape, BNode):
+            shape = self.shapes_graph.value(predicate=SH.property, object=shape) or shape
+        return str(shape).split("#")[-1]
+
+    def results(self, turtle: str) -> set[tuple[str, str | None, str, str]]:
+        """Validate a data snippet; return (focus node, path, severity, node shape) names."""
         data = self.ontology_graph + Graph().parse(data=self.PREFIXES + turtle, format="turtle")
         _, results_graph, _ = validate(
             data,
@@ -114,6 +122,7 @@ class TestSecurityShapesRejectBadData(unittest.TestCase):
                     str(results_graph.value(result, SH.focusNode)).split("#")[-1],
                     str(path).split("#")[-1] if path is not None else None,
                     str(results_graph.value(result, SH.resultSeverity)).split("#")[-1],
+                    self.shape_name(results_graph.value(result, SH.sourceShape)),
                 )
             )
         return found
@@ -123,43 +132,50 @@ class TestSecurityShapesRejectBadData(unittest.TestCase):
             ":Fn a :LambdaFunction ; :hasExecutionRole :RoleA, :RoleB . "
             ":RoleA a :IAMRole . :RoleB a :IAMRole ."
         )
-        self.assertIn(("Fn", "hasExecutionRole", "Violation"), found)
+        self.assertIn(("Fn", "hasExecutionRole", "Violation", "LambdaFunctionShape"), found)
 
     def test_lambda_without_execution_role_warns(self):
         found = self.results(":Fn a :LambdaFunction .")
-        self.assertIn(("Fn", "hasExecutionRole", "Warning"), found)
+        self.assertIn(("Fn", "hasExecutionRole", "Warning", "LambdaFunctionShape"), found)
 
     def test_ec2_instance_has_at_most_one_instance_profile(self):
         found = self.results(
             ":Vm a :EC2Instance ; :hasInstanceProfile :P1, :P2 . "
             ":P1 a :IAMInstanceProfile . :P2 a :IAMInstanceProfile ."
         )
-        self.assertIn(("Vm", "hasInstanceProfile", "Violation"), found)
+        self.assertIn(("Vm", "hasInstanceProfile", "Violation", "EC2InstanceShape"), found)
 
     def test_instance_profile_has_at_most_one_role(self):
         found = self.results(
             ":P a :IAMInstanceProfile ; :hasRole :RoleA, :RoleB . "
             ":RoleA a :IAMRole . :RoleB a :IAMRole ."
         )
-        self.assertIn(("P", "hasRole", "Violation"), found)
+        self.assertIn(("P", "hasRole", "Violation", "IAMInstanceProfileShape"), found)
 
-    def tagged_bucket(self, user_tags: int, system_tags: int) -> str:
+    TAG_LIMIT = ("Bucket", None, "Violation", "TaggedResourceShape")
+
+    def tagged_bucket(self, user_tags: int, system_prefixes: tuple[str, ...] = ()) -> str:
         lines = [":Bucket a :S3Bucket ."]
         for i in range(user_tags):
             lines.append(f':Bucket :hasTag :U{i} . :U{i} a :Tag ; :tagKey "team{i}" .')
-        for i in range(system_tags):
+        for i, prefix in enumerate(system_prefixes):
             lines.append(
-                f':Bucket :hasTag :S{i} . :S{i} a :Tag ; :tagKey "aws:cloudformation:k{i}" .'
+                f':Bucket :hasTag :S{i} . :S{i} a :Tag ; :tagKey "{prefix}cloudformation:k{i}" .'
             )
         return "\n".join(lines)
 
     def test_more_than_50_user_tags_is_rejected(self):
-        found = self.results(self.tagged_bucket(user_tags=51, system_tags=0))
-        self.assertIn(("Bucket", None, "Violation"), found)
+        found = self.results(self.tagged_bucket(user_tags=51))
+        self.assertIn(self.TAG_LIMIT, found)
 
     def test_system_tags_do_not_count_toward_the_limit(self):
-        found = self.results(self.tagged_bucket(user_tags=50, system_tags=5))
-        self.assertNotIn(("Bucket", None, "Violation"), found)
+        found = self.results(self.tagged_bucket(user_tags=50, system_prefixes=("aws:",) * 5))
+        self.assertNotIn(self.TAG_LIMIT, found)
+
+    def test_reserved_prefix_is_case_insensitive(self):
+        """AWS reserves aws: in any letter case, so AWS: and Aws: keys are system tags too."""
+        found = self.results(self.tagged_bucket(user_tags=50, system_prefixes=("AWS:", "Aws:")))
+        self.assertNotIn(self.TAG_LIMIT, found)
 
     def test_tag_key_and_value_lengths(self):
         found = self.results(
@@ -168,9 +184,9 @@ class TestSecurityShapesRejectBadData(unittest.TestCase):
             ':NoKey a :Tag ; :tagValue "x" . '
             ':EmptyValue a :Tag ; :tagKey "owner" ; :tagValue "" .'
         )
-        self.assertIn(("Long", "tagKey", "Violation"), found)
-        self.assertIn(("BigValue", "tagValue", "Violation"), found)
-        self.assertIn(("NoKey", "tagKey", "Violation"), found)
+        self.assertIn(("Long", "tagKey", "Violation", "TagShape"), found)
+        self.assertIn(("BigValue", "tagValue", "Violation", "TagShape"), found)
+        self.assertIn(("NoKey", "tagKey", "Violation", "TagShape"), found)
         self.assertFalse([r for r in found if r[0] == "EmptyValue"])
 
     def test_access_level_must_be_one_of_five(self):
@@ -179,12 +195,14 @@ class TestSecurityShapesRejectBadData(unittest.TestCase):
             ':Typed a :Action ; :accessLevel "Read"^^xsd:string . '
             ':Plain a :Action ; :accessLevel "Permissions management" .'
         )
-        self.assertIn(("Bad", "accessLevel", "Violation"), found)
+        self.assertIn(("Bad", "accessLevel", "Violation", "ActionShape"), found)
         self.assertFalse([r for r in found if r[0] in ("Typed", "Plain")])
 
     def test_publicly_accessible_must_be_boolean(self):
         found = self.results(':Bucket a :S3Bucket ; :isPubliclyAccessible "yes" .')
-        self.assertIn(("Bucket", "isPubliclyAccessible", "Violation"), found)
+        self.assertIn(
+            ("Bucket", "isPubliclyAccessible", "Violation", "PubliclyAccessibleShape"), found
+        )
 
 
 if __name__ == "__main__":

@@ -387,7 +387,8 @@
     :hasPolicyAttachment :AmazonEKSWorkerNodePolicy, :AmazonEKS_CNI_Policy, :AmazonEC2ContainerRegistryReadOnly .
 
 # The ECS task execution role is used by the ECS agent (pulling images, writing logs), not by
-# the workload, so it isn't a hasExecutionRole. The workload's own role would be the task role.
+# the task's own code, so it isn't a hasExecutionRole. The task's own role is the task role,
+# recorded on the task definition (taskRoleArn).
 :WebApplicationService :uses :ECSTaskExecutionRole .
 :ProductionEKSCluster :uses :EKSServiceRole .
 :PrimaryNodeGroup :hasExecutionRole :EKSNodeInstanceRole .
