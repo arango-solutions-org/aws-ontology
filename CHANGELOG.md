@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- The ontology coverage monitor (`tools/propose_ontology_updates.py`) can use OpenAI: set an
+  `OPENAI_API_KEY` repository secret, and optionally an `OPENAI_MODEL` variable (default
+  `gpt-5.5`). Claude is still used when `ANTHROPIC_API_KEY` is set.
 - **Identity attachments, tags and exposure** for security and access analysis:
   - `hasExecutionRole` (`AWSResource` → `IAMRole`, sub-property of `uses`): the role the
     resource itself uses to call AWS services, e.g. a Lambda function's

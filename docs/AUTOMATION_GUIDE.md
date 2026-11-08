@@ -2,10 +2,10 @@
 
 > **⚠️ Superseded.** The daemon/cron/systemd/Docker options below (`automation/`) are deprecated
 > in favor of [`.github/workflows/ontology-monitor.yml`](../.github/workflows/ontology-monitor.yml),
-> a GitHub Actions workflow that runs on a schedule, uses Claude to triage AWS "What's New"
+> a GitHub Actions workflow that runs on a schedule, uses an LLM to triage AWS "What's New"
 > announcements against the PRD's declared scope, and opens a PR with proposed additions — see
 > [`tools/propose_ontology_updates.py`](../tools/propose_ontology_updates.py) and
-> [`automation/README.md`](../automation/README.md). Requires an `ANTHROPIC_API_KEY` repo secret.
+> [`automation/README.md`](../automation/README.md). Requires an `OPENAI_API_KEY` (or `ANTHROPIC_API_KEY`) repo secret.
 > This guide is kept for reference; new setups should use the GitHub Actions workflow instead.
 
 This guide covers all automation options for the AWS Ontology project, including scheduling, monitoring, and deployment strategies.

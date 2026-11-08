@@ -3,22 +3,25 @@
 Agentic ontology-update monitor.
 
 Checks the AWS "What's New" feed for services/features the ontology doesn't
-cover yet, using Claude to triage against the PRD's declared scope. Writes a
+cover yet, using an LLM (Claude or OpenAI) to triage against the PRD's declared scope. Writes a
 dated proposal document (never touches ontology/aws.ttl directly — proposed
 classes are drafts for a human, or a future interactive session, to verify
 and integrate with the same rigor as every other addition in this repo: real
 ARN formats, domain/range checks, SHACL validation, tests).
 
-Requires ANTHROPIC_API_KEY. Designed to run from .github/workflows/
+Requires ANTHROPIC_API_KEY (Claude) or OPENAI_API_KEY (OpenAI; model from OPENAI_MODEL,
+default gpt-5.5). If both are set, Claude is used. Designed to run from .github/workflows/
 ontology-monitor.yml on a schedule; exits 0 with no output file when nothing
 new is found, so the workflow only opens a PR when there's something to review.
 
 Usage:
     python tools/propose_ontology_updates.py --days 8
     python tools/propose_ontology_updates.py --days 8 --output-dir docs/proposals
+    uv run --group monitor --env-file .env python tools/propose_ontology_updates.py  # key in .env
 """
 
 import argparse
+import json
 import logging
 import os
 import re
@@ -126,9 +129,40 @@ def call_claude(prompt: str) -> dict:
     if response.stop_reason == "refusal":
         raise RuntimeError(f"Claude declined the request: {response.stop_details}")
     text = next(b.text for b in response.content if b.type == "text")
-    import json
-
     return json.loads(text)
+
+
+def call_openai(prompt: str) -> dict:
+    from openai import OpenAI
+
+    client = OpenAI()
+    response = client.responses.create(
+        model=os.getenv("OPENAI_MODEL") or "gpt-5.5",
+        max_output_tokens=16000,
+        input=prompt,
+        text={
+            "format": {
+                "type": "json_schema",
+                "name": "findings",
+                "schema": FINDINGS_SCHEMA,
+                "strict": True,
+            }
+        },
+    )
+    for item in response.output:
+        for part in getattr(item, "content", None) or []:
+            if part.type == "refusal":
+                raise RuntimeError(f"OpenAI declined the request: {part.refusal}")
+    if response.status != "completed":
+        raise RuntimeError(f"OpenAI response {response.status}: {response.incomplete_details}")
+    return json.loads(response.output_text)
+
+
+def call_llm(prompt: str) -> dict:
+    """Use Claude when ANTHROPIC_API_KEY is set, otherwise OpenAI."""
+    if os.getenv("ANTHROPIC_API_KEY"):
+        return call_claude(prompt)
+    return call_openai(prompt)
 
 
 def write_proposal(findings: list[dict], output_dir: Path) -> Path:
@@ -190,8 +224,8 @@ def main() -> int:
 
     setup_tool_logging("propose_ontology_updates", args.verbose)
 
-    if not os.getenv("ANTHROPIC_API_KEY"):
-        logging.error("ANTHROPIC_API_KEY is not set")
+    if not (os.getenv("ANTHROPIC_API_KEY") or os.getenv("OPENAI_API_KEY")):
+        logging.error("Neither ANTHROPIC_API_KEY nor OPENAI_API_KEY is set")
         return 1
 
     monitor = AWSChangeMonitor()
@@ -205,7 +239,7 @@ def main() -> int:
     covered, roadmap = extract_prd_scope(prd_text)
 
     prompt = build_prompt(changes, covered, roadmap)
-    result = call_claude(prompt)
+    result = call_llm(prompt)
     new_findings = [f for f in result["findings"] if f["is_new"]]
 
     if not new_findings:

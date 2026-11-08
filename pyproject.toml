@@ -28,6 +28,7 @@ dev = [
 # Agentic ontology-coverage monitor (tools/propose_ontology_updates.py): `uv sync --group monitor`
 monitor = [
     "anthropic>=0.120.2",
+    "openai>=3.46.0",
 ]
 
 # This repo is an ontology plus operational scripts, not an importable library —

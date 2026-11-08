@@ -26,10 +26,13 @@ untracked `.env` file (`.env` is already in `.gitignore`).
 
 | Variable | Purpose |
 |----------|---------|
-| `ANTHROPIC_API_KEY` | Claude API key used to triage AWS "What's New" items. In GitHub Actions this comes from the `ANTHROPIC_API_KEY` repository secret. |
+| `OPENAI_API_KEY` | OpenAI API key used to triage AWS "What's New" items. In GitHub Actions this comes from the `OPENAI_API_KEY` repository secret. |
+| `OPENAI_MODEL` | Optional. OpenAI model to use (default `gpt-5.5`). In GitHub Actions this comes from the `OPENAI_MODEL` repository variable. |
+| `ANTHROPIC_API_KEY` | Claude API key; an alternative to `OPENAI_API_KEY`, used instead of it when both are set. In GitHub Actions this comes from the `ANTHROPIC_API_KEY` repository secret. |
 | `GITHUB_OUTPUT` | Set automatically by GitHub Actions; the tool writes `findings` / `proposal_path` outputs there. |
 
-Install the tool's dependency with `uv sync --group monitor`.
+Install the tool's dependencies with `uv sync --group monitor`. To run it locally with the key
+in `.env`: `uv run --group monitor --env-file .env python tools/propose_ontology_updates.py`.
 
 ## Tests
 

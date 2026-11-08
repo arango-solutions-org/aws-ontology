@@ -4,9 +4,11 @@ name: Ontology coverage monitor
 # ontology and opens a PR proposing draft additions for human review. Never
 # touches ontology/aws.ttl directly — see tools/propose_ontology_updates.py.
 #
-# Requires an ANTHROPIC_API_KEY repo secret. Without it, this workflow fails
-# loudly on every scheduled run rather than silently doing nothing — add the
-# secret (Settings -> Secrets and variables -> Actions) to enable it.
+# Requires an OPENAI_API_KEY or ANTHROPIC_API_KEY repo secret (Claude is used if
+# both are set). Without one, this workflow fails loudly on every scheduled run
+# rather than silently doing nothing — add a secret (Settings -> Secrets and
+# variables -> Actions) to enable it. An optional OPENAI_MODEL repo variable
+# overrides the default OpenAI model.
 
 on:
   schedule:
@@ -36,6 +38,8 @@ jobs:
         id: monitor
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
         run: uv run python tools/propose_ontology_updates.py --days 8
 
       - name: Open PR with findings

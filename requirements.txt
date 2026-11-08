@@ -17,4 +17,4 @@ python-arango>=7.5.0
 # NOTE: pyproject.toml is the canonical dependency manifest (use `uv sync`).
 # This file is kept for pip-based installs and the Docker image.
 # Optional groups live in pyproject: `dev` (pytest, ruff, owlready2/HermiT, ...) and
-# `monitor` (anthropic, for tools/propose_ontology_updates.py).
+# `monitor` (openai/anthropic, for tools/propose_ontology_updates.py).
