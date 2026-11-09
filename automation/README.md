@@ -4,7 +4,7 @@ This directory's scheduling daemon (`schedule_monitoring.py` + the Docker/system
 deployment mechanisms alongside it) is superseded by
 [`.github/workflows/ontology-monitor.yml`](../.github/workflows/ontology-monitor.yml), which
 runs on a GitHub Actions schedule, calls an LLM (OpenAI or Claude) to triage AWS "What's New" announcements against
-the PRD's declared scope, and opens a PR with proposed additions — see
+the PRD's declared scope, and opens an issue with proposed additions — see
 [`tools/propose_ontology_updates.py`](../tools/propose_ontology_updates.py).
 
 **Known bugs, left unfixed since this code is being replaced, not maintained:**

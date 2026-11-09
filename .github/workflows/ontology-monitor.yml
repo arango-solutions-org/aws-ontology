@@ -1,8 +1,11 @@
 name: Ontology coverage monitor
 
 # Checks the AWS "What's New" feed for services/features not yet in the
-# ontology and opens a PR proposing draft additions for human review. Never
-# touches ontology/aws.ttl directly — see tools/propose_ontology_updates.py.
+# ontology, pushes the draft additions to a branch and opens an issue for human
+# review, with a link to turn the branch into a PR. (An issue, not a PR: the
+# arango-solutions-org organization doesn't let GitHub Actions create pull
+# requests.) Never touches ontology/aws.ttl directly — see
+# tools/propose_ontology_updates.py.
 #
 # Requires an OPENAI_API_KEY or ANTHROPIC_API_KEY repo secret (Claude is used if
 # both are set). Without one, this workflow fails loudly on every scheduled run
@@ -17,7 +20,7 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
+  issues: write
 
 jobs:
   check-for-updates:
@@ -42,19 +45,33 @@ jobs:
           OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
         run: uv run python tools/propose_ontology_updates.py --days 8
 
-      - name: Open PR with findings
+      - name: Push findings and open an issue
         if: steps.monitor.outputs.findings == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
+          PROPOSAL: ${{ steps.monitor.outputs.proposal_path }}
         run: |
-          BRANCH="ontology-proposal/$(date +%Y-%m-%d)"
+          DATE="$(date +%Y-%m-%d)"
+          BRANCH="ontology-proposal/${DATE}-${GITHUB_RUN_NUMBER}"
           git config user.name "ontology-monitor[bot]"
           git config user.email "ontology-monitor[bot]@users.noreply.github.com"
           git checkout -b "$BRANCH"
-          git add "${{ steps.monitor.outputs.proposal_path }}"
-          git commit -m "docs: proposed ontology coverage additions ($(date +%Y-%m-%d))"
+          git add "$PROPOSAL"
+          git commit -m "docs: proposed ontology coverage additions (${DATE})"
           git push origin "$BRANCH"
-          gh pr create \
-            --title "Ontology coverage proposal: $(date +%Y-%m-%d)" \
-            --body "Automated findings from the AWS \"What's New\" feed. Draft proposals only — review, verify ARN formats, and integrate into \`ontology/aws.ttl\` manually (with tests + SHACL validation) before merging." \
-            --label "ontology-proposal"
+          COMPARE="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/compare/${GITHUB_REF_NAME}...${BRANCH}?expand=1"
+          {
+            echo "Automated findings from the AWS \"What's New\" feed, pushed to \`${BRANCH}\`."
+            echo
+            echo "Draft proposals only: review, verify ARN formats, and integrate into \`ontology/aws.ttl\` manually (with tests and SHACL validation)."
+            echo "To keep the proposal document in the repo, [open a PR from the branch](${COMPARE}); otherwise close this issue and delete the branch."
+            echo
+            echo "---"
+            echo
+            cat "$PROPOSAL"
+          } > issue-body.md
+          gh issue create \
+            --title "Ontology coverage proposal: ${DATE}" \
+            --body-file issue-body.md \
+            --label "ontology-proposal" \
+            --assignee plosiewicz

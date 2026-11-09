@@ -12,7 +12,7 @@ ARN formats, domain/range checks, SHACL validation, tests).
 Requires ANTHROPIC_API_KEY (Claude) or OPENAI_API_KEY (OpenAI; model from OPENAI_MODEL,
 default gpt-5.5). If both are set, Claude is used. Designed to run from .github/workflows/
 ontology-monitor.yml on a schedule; exits 0 with no output file when nothing
-new is found, so the workflow only opens a PR when there's something to review.
+new is found, so the workflow only opens an issue when there's something to review.
 
 Usage:
     python tools/propose_ontology_updates.py --days 8
