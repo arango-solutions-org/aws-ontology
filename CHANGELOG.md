@@ -63,6 +63,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   code uses (`hasExecutionRole`). The ECS example now records both on its task definition, with a
   new `WebApplicationTaskRole`. PRD v2.4 adds it to REQ-042.
 
+### Changed
+- The ontology coverage monitor assigns its proposal PRs to `plosiewicz`, and adds the run number
+  to the proposal branch name so two runs on the same day don't collide.
+
 ### Fixed
 - **REQ-016: every property now has a domain and a range** (generic and inverse properties
   excepted). Added domains to `belongsToRegion`, `belongsToVPC`, `publishesToTopic`,

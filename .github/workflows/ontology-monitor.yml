@@ -47,7 +47,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          BRANCH="ontology-proposal/$(date +%Y-%m-%d)"
+          # The run number keeps a manual and a scheduled run on the same day from colliding.
+          BRANCH="ontology-proposal/$(date +%Y-%m-%d)-${GITHUB_RUN_NUMBER}"
           git config user.name "ontology-monitor[bot]"
           git config user.email "ontology-monitor[bot]@users.noreply.github.com"
           git checkout -b "$BRANCH"
@@ -57,4 +58,5 @@ jobs:
           gh pr create \
             --title "Ontology coverage proposal: $(date +%Y-%m-%d)" \
             --body "Automated findings from the AWS \"What's New\" feed. Draft proposals only — review, verify ARN formats, and integrate into \`ontology/aws.ttl\` manually (with tests + SHACL validation) before merging." \
-            --label "ontology-proposal"
+            --label "ontology-proposal" \
+            --assignee plosiewicz
