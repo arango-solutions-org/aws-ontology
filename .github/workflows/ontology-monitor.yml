@@ -48,20 +48,22 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           PROPOSAL_PATH: ${{ steps.monitor.outputs.proposal_path }}
+          # Date, run number and attempt; it also names the proposal file, so the file, branch
+          # and PR all match and no two runs (same day, or a re-run) collide.
+          PROPOSAL_ID: ${{ steps.monitor.outputs.proposal_id }}
           ASSIGNEE: ${{ vars.MONITOR_ASSIGNEE || 'plosiewicz' }}
         run: |
-          # Run number and attempt keep a manual and a scheduled run on the same day, and a
-          # re-run of a failed run, from colliding on the branch name.
-          LABEL="$(date +%Y-%m-%d) run ${GITHUB_RUN_NUMBER}"
-          BRANCH="ontology-proposal/$(date +%Y-%m-%d)-run${GITHUB_RUN_NUMBER}-${GITHUB_RUN_ATTEMPT}"
+          BRANCH="ontology-proposal/${PROPOSAL_ID}"
           git config user.name "ontology-monitor[bot]"
           git config user.email "ontology-monitor[bot]@users.noreply.github.com"
           git checkout -b "$BRANCH"
           git add "$PROPOSAL_PATH"
-          git commit -m "docs: proposed ontology coverage additions (${LABEL})"
+          git commit -m "docs: proposed ontology coverage additions (${PROPOSAL_ID})"
           git push origin "$BRANCH"
-          gh pr create \
-            --title "Ontology coverage proposal: ${LABEL}" \
+          PR_URL="$(gh pr create \
+            --title "Ontology coverage proposal: ${PROPOSAL_ID}" \
             --body "Automated findings from the AWS \"What's New\" feed. Draft proposals only — review, verify ARN formats, and integrate into \`ontology/aws.ttl\` manually (with tests + SHACL validation) before merging." \
-            --label "ontology-proposal" \
-            --assignee "$ASSIGNEE"
+            --label "ontology-proposal")"
+          # Best effort: a login that can't be assigned must not cost us the PR.
+          gh pr edit "$PR_URL" --add-assignee "$ASSIGNEE" \
+            || echo "::warning::Could not assign ${ASSIGNEE} to ${PR_URL}"
