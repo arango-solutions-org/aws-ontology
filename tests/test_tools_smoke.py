@@ -7,11 +7,14 @@ work (import errors, argparse conflicts, missing dependencies) — bugs that the
 ontology-data tests can never catch because they don't execute the tools.
 """
 
+import os
 import py_compile
 import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 PROJECT_ROOT = Path(__file__).parent.parent
 
@@ -67,14 +70,11 @@ class TestProposalId(unittest.TestCase):
     """Each monitor run's proposal is unique (two runs a day, or a re-run, must not clash)."""
 
     def proposal_id(self, **github_env):
-        import os
-        from unittest import mock
-
         from tools.propose_ontology_updates import proposal_id
 
-        env = {k: v for k, v in os.environ.items() if not k.startswith("GITHUB_RUN_")}
-        env.update(github_env)
-        with mock.patch.dict(os.environ, env, clear=True):
+        with mock.patch.dict(os.environ, github_env):
+            for name in {"GITHUB_RUN_NUMBER", "GITHUB_RUN_ATTEMPT"} - github_env.keys():
+                os.environ.pop(name, None)
             return proposal_id()
 
     def test_actions_run_and_attempt(self):
@@ -89,8 +89,6 @@ class TestProposalId(unittest.TestCase):
         self.assertRegex(self.proposal_id(), r"^\d{4}-\d{2}-\d{2}$")
 
     def test_id_names_file_and_heading(self):
-        import tempfile
-
         from tools.propose_ontology_updates import write_proposal
 
         finding = {
