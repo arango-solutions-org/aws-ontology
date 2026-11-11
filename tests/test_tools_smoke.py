@@ -63,6 +63,37 @@ class TestCLISmoke(unittest.TestCase):
         self.assertEqual(result.returncode, 0, f"sync check failed:\n{result.stdout}")
 
 
+class TestProposalFileName(unittest.TestCase):
+    """The monitor's proposal file is unique per GitHub Actions run (two runs a day must not clash)."""
+
+    def write(self, run_number):
+        import os
+        import tempfile
+        from unittest import mock
+
+        from tools.propose_ontology_updates import write_proposal
+
+        finding = {
+            "service_name": "Example",
+            "rationale": "r",
+            "source_link": "https://example.com",
+            "candidate_classes": [],
+            "candidate_properties": [],
+            "example_arn_format": None,
+        }
+        env = {k: v for k, v in os.environ.items() if k != "GITHUB_RUN_NUMBER"}
+        if run_number:
+            env["GITHUB_RUN_NUMBER"] = run_number
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.dict(os.environ, env, clear=True):
+            return write_proposal([finding], Path(tmp)).name
+
+    def test_name_includes_run_number_in_actions(self):
+        self.assertRegex(self.write("57"), r"^\d{4}-\d{2}-\d{2}-run57-monitor-findings\.md$")
+
+    def test_name_is_date_only_locally(self):
+        self.assertRegex(self.write(None), r"^\d{4}-\d{2}-\d{2}-monitor-findings\.md$")
+
+
 class TestModulesCompile(unittest.TestCase):
     """Every module must byte-compile (catches syntax errors in rarely-run paths)."""
 

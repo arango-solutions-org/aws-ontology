@@ -168,7 +168,10 @@ def call_llm(prompt: str) -> dict:
 def write_proposal(findings: list[dict], output_dir: Path) -> Path:
     output_dir.mkdir(parents=True, exist_ok=True)
     date_str = datetime.now().strftime("%Y-%m-%d")
-    out_path = output_dir / f"{date_str}-monitor-findings.md"
+    # In GitHub Actions, the run number keeps two runs on the same day from writing the same file
+    # (their PRs would then conflict).
+    run = os.getenv("GITHUB_RUN_NUMBER")
+    out_path = output_dir / f"{date_str}{f'-run{run}' if run else ''}-monitor-findings.md"
 
     lines = [
         f"# Ontology Coverage Proposal — {date_str}",
